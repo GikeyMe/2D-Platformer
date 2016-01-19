@@ -1,0 +1,25 @@
+19th January 2016
+
+Today I implemented the code for moving platforms. This required a new "MovingPlatform" script, and some changes to the "Player" script.
+
+I originally thought the process would be very simple. I could use the same principles I used to allow the AI agent to move, in order to
+allow the platform to move. This is the code I added to the "MovingPlatform" script, and it pretty much did the job. The platform I attached the script to
+moved nicely. If I jumped onto it with the player character, the collision worked fine, and I could ride it down. However on the way back up, the 
+PlayCharacter would play the "Falling" animation and I would lose all control of it until the platform reached the top and started to move back down again.
+Clearly this needed to be fixed.
+
+I decided the best course of action was to edit the "Player" script so that the it could detect when the player was stood on ontop of the moving platform
+and ensure that the falling animation did not play.
+
+I believe the reason this bug occurred at all was due to the fact that the colliders on the players feet and the platform weren't behaving correctly so I
+couldn't use them to detect whether or not the player is on the platform so I decided instead to look at the player's X/Y coordinates and check them against
+the X/Y coordinates of the platform. If they were close enough to each other, I could treat the player as if he was just stood on solid ground, and therefore
+the player wouldn't lose control, and the falling animation wouldn't play.
+
+This actually worked pretty well. The main complexity came when I needed to consider how to implement this for multiple moving platforms throughout the level,
+as they will all have their own set of X/Y coordinates. I originally tried to loop through all of the MovingPlatforms I could find using the line 
+"GameObject.Find("MovingPlatform (" + index.ToString() + ")");" but this was causing performance issues as GameObject.Find is a performance intensive operation,
+and I was calling it multiple times in a loop, every time the Update() procedure was called.
+
+I decided the best course of action to correct this was to create an ArrayList and populate it with all of the MovingPlatforms using GameObject.Find
+within the Start() procedure. I could then access the arraylist later within the Update() method with much less of a hit to performance.

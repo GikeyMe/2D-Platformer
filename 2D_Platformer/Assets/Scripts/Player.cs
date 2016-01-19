@@ -23,20 +23,46 @@ public class Player : MonoBehaviour {
 
     private Rigidbody2D PlayerRigidbody;
 
+    private ArrayList MovingPlatforms = new ArrayList();
+    private GameObject platform;
+
+    private bool OnMovingPlat;
+
 
     // Use this for initialization
     void Start () {
+        int index = 1;
         facingRight = true;                              //we know the player character starts off facing right so set this to true
         PlayerRigidbody = GetComponent<Rigidbody2D>();   //Get the Rigidbody2D and Animator objects from unity
         PlayerAnimator = GetComponent<Animator>();
-	}
+
+        platform = GameObject.Find("MovingPlatform");                     //Add the first (non numbered) MovingPlatform to the arraylist if it exists.
+        if (platform != null)
+            MovingPlatforms.Add(platform);
+            
+        while (true)                                                                           //loop until we have all of the MovingPlatforms in the game added to this ArrayList.
+        {
+            platform = GameObject.Find("MovingPlatform (" + index.ToString() + ")");
+            if (platform == null)  
+            {
+                break;
+            }
+            else
+            {
+                MovingPlatforms.Add(platform);
+            }
+            index++;
+        }
+        
+    }
 	
 	void FixedUpdate () {
         onGround = CheckGrounded();                     //better to use a variable here so we don't need to keep calling CheckGrounded() throughout FixedUpdate, don't want to slow the game down.
+        OnMovingPlat = IsPlayerOnMovingPlatform();
         float horizontal = Input.GetAxis("Horizontal"); //Unity already has keybinds set up for right and left movement. GetAxis returns a float representing the direction the player is inputting.
         PlayerMovement(horizontal);  // handle player movement
         Flip(horizontal);            // do we need to flip the sprite?
-        HandleLayers();              
+        HandleLayers();
     }
 
     //called once per frame
@@ -61,9 +87,24 @@ public class Player : MonoBehaviour {
         }
     }
 
+    private bool IsPlayerOnMovingPlatform()
+    { 
+         foreach (GameObject plat in MovingPlatforms)
+          {
+            if (Mathf.Abs(PlayerRigidbody.transform.position.x - plat.transform.position.x) < 16 && Mathf.Abs(PlayerRigidbody.transform.position.x - plat.transform.position.x) > 7)
+            {
+               if (Mathf.Abs(PlayerRigidbody.transform.position.y - plat.transform.position.y) < 0.25)
+               {
+                  return true;
+              }
+            }
+           }
+        return false;
+    }
+
     private void PlayerMovement(float horizontal)
     {
-        if(PlayerRigidbody.velocity.y < 0)  //if player character is falling
+        if(PlayerRigidbody.velocity.y < 0  && !(OnMovingPlat))  //if player character is falling and not on a moving platform
         {
             PlayerAnimator.SetBool("Falling", true); //play falling animation. This can't be a trigger because we are unsure how far the player character is falling and so the animation has to be played 
         }                                            // until explicitly told to stop. (i.e boolean is false again)
@@ -107,6 +148,8 @@ public class Player : MonoBehaviour {
 
     private bool CheckGrounded()
     {
+        if (OnMovingPlat)
+            return true;
         if (PlayerRigidbody.velocity.y <= 0)  //if we are not jumping
         {
             foreach (Transform point in groundPoints)
