@@ -1,4 +1,5 @@
 19th January 2016
+---------------------
 
 Today I implemented the code for moving platforms. This required a new "MovingPlatform" script, and some changes to the "Player" script.
 
@@ -23,3 +24,49 @@ and I was calling it multiple times in a loop, every time the Update() procedure
 
 I decided the best course of action to correct this was to create an ArrayList and populate it with all of the MovingPlatforms using GameObject.Find
 within the Start() procedure. I could then access the arraylist later within the Update() method with much less of a hit to performance.
+
+20th January 2016
+-----------------------
+
+Added a shooting animation. Note that no back end projectile system is in place yet, there is no collision detection on projectiles and health and damage 
+systems still don't exist for the player and enemies. Animating the player for shooting was fairly similar to most other animations so that was done fairly 
+quickly. The new challenge to this task was to spawn the projectiles in the game. This was done with a simple bullet script, and some changes to the player
+script.
+
+The first step was to make the bullet animation a prefab (this is basically just a template from which objects can be created). Once this was done, I made
+a SerializedField in the player script so that I could simply drag the prefab into it from Unity, this then gives me access to the prefab within the player
+script. I then wrote a function that instantiates the bullet prefab. I needed the bullet to know which direction to travel in once it had been fired so
+I needed to pass a Vector to a function in the Bullet script based on which way the player is facing.
+
+The Bullet script was fairly simple. The initialize function decided on the direction it should travel based on the Vector passed by the Player script,
+after this the bullet simply set it's velocity to speed( a serialized field) * direction. Due to the fact that the player script can create these objects
+at a rapid rate, the bullet objects needed to know when to destroy themselves otherwise I could run into serious performance issues. Currently I am overriding
+the OnBecameInvisible function (which is called whenever an object is not within view of the camera) so that the bullets destroy themselves whenever they
+leave the Camera's view. However this will likely need to be changed in the future.
+
+Overall I expect the Bullet script to become more complex when I start to add the back end projectile system.
+
+Added an "Agent" Script, this will be the super class for all simple AI agents. Almost all of "Slimes" functionality is currently inherited.
+
+21st January 2016
+------------------
+
+Today I started work on damage and health for the player and the AI. After creating all 4 animations, I then  gave both of them an integer "hitpoints" 
+that keeps track of health. I also created two new functions in each. One responsible for damaging the health, and one to check whether or not the 
+player or agent is still alive.
+
+Once this was done, it was possible for both player and AI to keep track of their health, damage it and play the death animation when necessary, so the next
+step was to actually create things to trigger damage on each of them.
+
+I added a collider to the "Bullet" prefab, and then in the Agent script I wrote the OnTriggerEnter2D function (called when something collides with the agent's
+hitbox.). I made this function check to see if the object that collided with the agent is a bullet, and if so, call the TakeDamage function for the agent.
+
+The next thing I worked on was the player's melee attack. I created a new collider that is actually disabled by default. When the player presses the melee
+attack key, the collider is enabled. In this way I can use the OnTriggerEnter2D function in the agent script to check if it has collided with the player's
+melee attack hitbox, if so it could call the TakeDamage function.
+
+This was particularly challenging because there seems to be a bug where if the player is stood still and the agent is stood next to him, and the player
+attacks, the agent does not register the hit. Obviously this is very bad because that is one of the few times someone would want to use a melee attack.
+A fix to this that seems to work for now is to increase the player's velocity by a negligible amount, this makes the agent register the hit. Although
+I would like to revisit this fix and hopefully come up with a nicer solution. 
+

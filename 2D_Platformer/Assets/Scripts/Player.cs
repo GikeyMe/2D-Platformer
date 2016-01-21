@@ -8,7 +8,7 @@ public class Player : MonoBehaviour {
     [SerializeField]
     private float jumpSpeed;
     [SerializeField]
-    private bool airControl;                                        //remove this later if I don't use it for power ups  
+    private bool airMovement;                                        
     [SerializeField]
     private Transform[] groundPoints;
     [SerializeField]
@@ -26,7 +26,20 @@ public class Player : MonoBehaviour {
     private ArrayList MovingPlatforms = new ArrayList();
     private GameObject platform;
 
+    [SerializeField]
+    private GameObject bulletPrefab;
+
+    [SerializeField]
+    private Transform BulletPosition;
+
     private bool OnMovingPlat;
+
+    [SerializeField]
+    private int hitpoints;
+
+    [SerializeField]
+    private BoxCollider2D MeleeHitbox;
+
 
 
     // Use this for initialization
@@ -85,6 +98,16 @@ public class Player : MonoBehaviour {
                 PlayerRigidbody.AddForce(new Vector2(0, jumpSpeed));    // make the player character jump (i.e apply a positive force on the y axis)
                 PlayerAnimator.SetTrigger("Jump");                         // Trigger the jump animation
         }
+
+        if (Input.GetKeyDown(KeyCode.LeftControl))
+        {
+            PlayerAnimator.SetBool("Shooting", true);
+        }
+
+        if (Input.GetKeyUp(KeyCode.LeftControl))
+        {
+            PlayerAnimator.SetBool("Shooting", false);
+        }
     }
 
     private bool IsPlayerOnMovingPlatform()
@@ -109,7 +132,7 @@ public class Player : MonoBehaviour {
             PlayerAnimator.SetBool("Falling", true); //play falling animation. This can't be a trigger because we are unsure how far the player character is falling and so the animation has to be played 
         }                                            // until explicitly told to stop. (i.e boolean is false again)
 
-        if (!this.PlayerAnimator.GetCurrentAnimatorStateInfo(0).IsTag("Melee") && (onGround || airControl)) //if we aren't already playing melee animation and we aren't jumping or falling,
+        if (!this.PlayerAnimator.GetCurrentAnimatorStateInfo(0).IsTag("Melee") && (onGround || airMovement)) //if we aren't already playing melee animation and we aren't jumping or falling,
         {                                                                                                   // then we are allowed to move horizontally
             PlayerRigidbody.velocity = new Vector2(horizontal * runSpeed, PlayerRigidbody.velocity.y);
         }
@@ -180,5 +203,56 @@ public class Player : MonoBehaviour {
         {
             PlayerAnimator.SetLayerWeight(1, 0); //set weight for air layer (layer 1) to none (0)
         }
+    }
+
+    public void FireBullet()
+    {
+        GameObject bullet = (GameObject)Instantiate(bulletPrefab, BulletPosition.position, Quaternion.identity);
+        if (facingRight)
+        {  
+            bullet.GetComponent<Bullet>().Initialize(Vector2.right);
+        }
+        else
+        {
+            bullet.GetComponent<Bullet>().Initialize(Vector2.left);
+        }
+    }
+
+    public void TakeDamage(int hp)
+    {
+        hitpoints -= hp;
+        if (Alive())
+        {
+            PlayerAnimator.SetTrigger("Damage");
+        }
+        else
+        {
+            PlayerAnimator.SetTrigger("Death");
+        }
+    }
+
+    public void StartMelee()
+    {            
+        MeleeHitbox.enabled = true;                                                       //Will be used by animator to switch on hitbox while player is melee attacking, kept off at all other times
+        PlayerRigidbody.velocity = new Vector2((float)0.000001, PlayerRigidbody.velocity.y);  //Need a tiny velocity to trigger the OnTriggerEnter event in Agent.
+    }
+
+    public void StopMelee()
+    {
+        MeleeHitbox.enabled = false;
+        PlayerRigidbody.velocity = new Vector2(0, PlayerRigidbody.velocity.y);
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.gameObject.name == ("SpikeTrigger"))
+        {
+            TakeDamage(100);
+        }
+    }
+
+    private bool Alive()
+    {
+        return hitpoints > 0;     
     }
 }
