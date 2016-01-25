@@ -16,8 +16,11 @@ public abstract class Agent : MonoBehaviour {
     private float xPatrolStop;
     [SerializeField]
     private bool Patrol;
+    [SerializeField]
+    private BoxCollider2D MeleeHitBox;
     private bool PlayerNearby;
     private GameObject player;
+    private bool RecentlyAttacked;
 
 
     [SerializeField]
@@ -43,8 +46,12 @@ public abstract class Agent : MonoBehaviour {
 
             if (Patrol && !PlayerNearby)
                 AgentPatrol();
-            if (PlayerNearby)
+            if (PlayerNearby  && !RecentlyAttacked)
                 MoveToPlayer();
+            if (PlayerNearby && RecentlyAttacked)
+            {
+                MoveFromPlayer();
+            }
         }
     }
 
@@ -53,13 +60,29 @@ public abstract class Agent : MonoBehaviour {
         return hitpoints > 0;
     }
 
+    private void MoveFromPlayer()
+    {
+        if (Mathf.Abs(player.transform.position.x - AgentRigidbody.transform.position.x) > 3)
+        {
+            RecentlyAttacked = false;
+        }
+        if ((player.transform.position.x > AgentRigidbody.transform.position.x) && AgentRigidbody.transform.position.x < xPatrolStop)
+        {
+            AgentRigidbody.velocity = new Vector2(-1 * runSpeed, AgentRigidbody.velocity.y);
+        }
+        if ((player.transform.position.x < AgentRigidbody.transform.position.x) && AgentRigidbody.transform.position.x > xPatrolStart)
+        {
+            AgentRigidbody.velocity = new Vector2(1 * runSpeed, AgentRigidbody.velocity.y);
+        }
+    }
+
     private void MoveToPlayer()
     {
-        
+        MeleeHitBox.enabled = false;
+
         if (Mathf.Abs(player.transform.position.x - AgentRigidbody.transform.position.x) < 1.5)
         {
-            AgentRigidbody.velocity = new Vector2(0 * runSpeed, AgentRigidbody.velocity.y);
-            AgentAnimator.SetFloat("speed", 0);
+            Attack();    
             return;
         }
         if ((player.transform.position.x > AgentRigidbody.transform.position.x) && AgentRigidbody.transform.position.x < xPatrolStop)
@@ -151,5 +174,15 @@ public abstract class Agent : MonoBehaviour {
     private void DestroyAgent()
     {
         Destroy(gameObject);
+    }
+
+
+    private void Attack()
+    { 
+        //otherwise just attack
+        MeleeHitBox.enabled = true;
+        AgentRigidbody.velocity = new Vector2((float)0.000001, AgentRigidbody.velocity.y);  //Need a tiny velocity to trigger the OnTriggerEnter event in Agent.
+        AgentRigidbody.velocity = new Vector2(0, AgentRigidbody.velocity.y);
+        RecentlyAttacked = true;
     }
 }

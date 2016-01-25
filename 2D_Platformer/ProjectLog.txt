@@ -70,3 +70,20 @@ attacks, the agent does not register the hit. Obviously this is very bad because
 A fix to this that seems to work for now is to increase the player's velocity by a negligible amount, this makes the agent register the hit. Although
 I would like to revisit this fix and hopefully come up with a nicer solution. 
 
+
+25th January 2016
+-----------------
+Today I added the functionality for the Slime AI to attack the player. At first this was quite similar to how it worked for the player. I added a meleehithox
+to the slime and told it to enable the hitbox when it called its attack function. I told the player to take damage if it collided with the Slime's meleehitbox.
+The problem with this was that the slime actually doesn't have an attack animation. So it was calling the attack function far too quickly and was instantly
+killing the player. Although this could pose an interesting challenge I don't think it is acceptable for the first AI the player is going to encounter.
+I added functionality to temporarily provide immunity to the player after taking damage. This was tricky to implement at first, I toyed with the idea
+of using a seperate thread to track this but later came across the Time.deltaTime property in C# which allowed me to write my own UpdateImmunity function 
+instead.
+
+Next I would like to make the slime back off after attacking so that it gives the appearance that the slime is hurting the player with it's momentum
+rather than it's mere presence (due to the lack of an attack animation.)
+
+I added the code to the agent script to make the slime back off between attacks. I also added code to the Player script to make the player sprite
+flicker while it is immune to damage. This provides a useful visual cue to the player.
+

@@ -23,6 +23,8 @@ public class Player : MonoBehaviour {
 
     private Rigidbody2D PlayerRigidbody;
 
+    private SpriteRenderer PlayerSpriteRenderer;
+
     private ArrayList MovingPlatforms = new ArrayList();
     private GameObject platform;
 
@@ -40,14 +42,20 @@ public class Player : MonoBehaviour {
     [SerializeField]
     private BoxCollider2D MeleeHitbox;
 
+    private bool Immunity;
+    private float ImmunityTime;
+    private float FlickerTime;
+
 
 
     // Use this for initialization
     void Start () {
+        Immunity = false;
         int index = 1;
         facingRight = true;                              //we know the player character starts off facing right so set this to true
         PlayerRigidbody = GetComponent<Rigidbody2D>();   //Get the Rigidbody2D and Animator objects from unity
         PlayerAnimator = GetComponent<Animator>();
+        PlayerSpriteRenderer = GetComponent<SpriteRenderer>();
 
         platform = GameObject.Find("MovingPlatform");                     //Add the first (non numbered) MovingPlatform to the arraylist if it exists.
         if (platform != null)
@@ -73,6 +81,7 @@ public class Player : MonoBehaviour {
         onGround = CheckGrounded();                     //better to use a variable here so we don't need to keep calling CheckGrounded() throughout FixedUpdate, don't want to slow the game down.
         OnMovingPlat = IsPlayerOnMovingPlatform();
         float horizontal = Input.GetAxis("Horizontal"); //Unity already has keybinds set up for right and left movement. GetAxis returns a float representing the direction the player is inputting.
+        UpdateImmunity();
         PlayerMovement(horizontal);  // handle player movement
         Flip(horizontal);            // do we need to flip the sprite?
         HandleLayers();
@@ -218,16 +227,49 @@ public class Player : MonoBehaviour {
         }
     }
 
+    private void UpdateImmunity()
+    {
+        if (Immunity)
+        {
+            SpriteFlicker();
+            ImmunityTime += Time.deltaTime;
+            if (ImmunityTime > 2)
+            {
+                Immunity = false;
+                PlayerSpriteRenderer.enabled = true;
+                ImmunityTime = 0;
+            }
+        }
+    }
+
+    private void SpriteFlicker()
+    {
+        if(FlickerTime < 0.1)
+        {
+            FlickerTime += Time.deltaTime;
+        }
+        else if(FlickerTime >= 0.1)
+        {
+            PlayerSpriteRenderer.enabled = !PlayerSpriteRenderer.enabled;
+            FlickerTime = 0;
+        }
+
+    }
+
     public void TakeDamage(int hp)
     {
-        hitpoints -= hp;
-        if (Alive())
+        if (!Immunity)
         {
-            PlayerAnimator.SetTrigger("Damage");
-        }
-        else
-        {
-            PlayerAnimator.SetTrigger("Death");
+            hitpoints -= hp;
+            Immunity = true;            
+            if (Alive())
+            {
+                PlayerAnimator.SetTrigger("Damage");
+            }
+            else
+            {
+                PlayerAnimator.SetTrigger("Death");
+            }
         }
     }
 
@@ -243,12 +285,21 @@ public class Player : MonoBehaviour {
         PlayerRigidbody.velocity = new Vector2(0, PlayerRigidbody.velocity.y);
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    private void OnTriggerEnter2D(Collider2D EnterredObject)
     {
-        if (collision.gameObject.name == ("SpikeTrigger"))
+        if (Alive() && !PlayerAnimator.GetCurrentAnimatorStateInfo(0).IsTag("Melee"))
         {
-            TakeDamage(100);
+            if (EnterredObject.tag == "SlimeMelee")
+            {
+                TakeDamage(20);
+            }
+
+            if (EnterredObject.gameObject.name == ("SpikeTrigger"))
+            {
+                TakeDamage(100);
+            }
         }
+        
     }
 
     private bool Alive()
