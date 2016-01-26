@@ -87,3 +87,13 @@ rather than it's mere presence (due to the lack of an attack animation.)
 I added the code to the agent script to make the slime back off between attacks. I also added code to the Player script to make the player sprite
 flicker while it is immune to damage. This provides a useful visual cue to the player.
 
+
+26th January 2016
+------------------
+Yesterday I found that the code for the agent was becoming quite complex and it seemed like alot of code to have inside just one script, and I felt like it
+would likely be difficult to maintain going forward, especiall as I add a larger variety of AI agents to the game. As such I decided to redesign the code
+to use the State design pattern for the AI agents. I have an Interface (IAgentState) and at the moment I have 4 concrete implementations of that, each
+representing a state the AI might need to be in. (IdleState, PatrolState, ChaseState, MeleeAttackState) The Agent script looks at the environment and 
+decides which state it should be in, and then the concrete implementation of state deals with how the agent should act.
+
+This should help keep code for each different state seperated and clearer in the long run.

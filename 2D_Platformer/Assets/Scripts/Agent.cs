@@ -17,18 +17,50 @@ public abstract class Agent : MonoBehaviour {
     [SerializeField]
     private bool Patrol;
     [SerializeField]
-    private BoxCollider2D MeleeHitBox;
+    public BoxCollider2D MeleeHitBox;
     private bool PlayerNearby;
     private GameObject player;
-    private bool RecentlyAttacked;
 
-
+    private IAgentState activeState;
     [SerializeField]
     protected int hitpoints;
 
 
+
+    public bool isFacingRight()
+    {
+        return facingRight;
+    }
+
+    public float getpatrolSpeed()
+    {
+        return patrolSpeed;
+    }
+
+    public float getrunSpeed()
+    {
+        return runSpeed;
+    }
+
+    public float getxPatrolStart()
+    {
+        return xPatrolStart;
+    }
+
+    public float getxPatrolStop()
+    {
+        return xPatrolStop;
+    }
+
+    private void SetState(IAgentState State)
+    {
+        activeState = State;
+        activeState.Activate(this);                  // pass the agent that is changing states to the necessary state
+    }
+
     // Use this for initialization
    protected virtual void Start () {
+        SetState(new IdleState());
         facingRight = true;                              //we know the slime starts off facing right so set this to true
         AgentRigidbody = GetComponent<Rigidbody2D>();   //Get the Rigidbody2D and Animator objects from unity
         AgentAnimator = GetComponent<Animator>();
@@ -36,22 +68,20 @@ public abstract class Agent : MonoBehaviour {
     }
 
     protected virtual void Update()
-    {
+    {       
         if (Alive())
         {
-            if (AgentRigidbody.velocity.x == 0)
-                AgentAnimator.SetFloat("speed", 0);
-
             PlayerNearby = LookForPlayer();
+            if (!Patrol && !PlayerNearby && !(activeState is IdleState))
+                SetState(new IdleState());
+            else if (Patrol && !PlayerNearby && !(activeState is PatrolState))
+                SetState(new PatrolState());
+            else if (PlayerMeleeRange() && !(activeState is MeleeAttackState))
+                SetState(new MeleeAttackState());         
+            else if (PlayerNearby && !PlayerMeleeRange() && !(activeState is ChaseState))
+                SetState(new ChaseState());
 
-            if (Patrol && !PlayerNearby)
-                AgentPatrol();
-            if (PlayerNearby  && !RecentlyAttacked)
-                MoveToPlayer();
-            if (PlayerNearby && RecentlyAttacked)
-            {
-                MoveFromPlayer();
-            }
+            activeState.Act();
         }
     }
 
@@ -60,44 +90,13 @@ public abstract class Agent : MonoBehaviour {
         return hitpoints > 0;
     }
 
-    private void MoveFromPlayer()
+    private bool PlayerMeleeRange()
     {
-        if (Mathf.Abs(player.transform.position.x - AgentRigidbody.transform.position.x) > 3)
+        if (Mathf.Abs(player.transform.position.x - AgentRigidbody.transform.position.x) < 3.1)
         {
-            RecentlyAttacked = false;
+            return true;
         }
-        if ((player.transform.position.x > AgentRigidbody.transform.position.x) && AgentRigidbody.transform.position.x < xPatrolStop)
-        {
-            AgentRigidbody.velocity = new Vector2(-1 * runSpeed, AgentRigidbody.velocity.y);
-        }
-        if ((player.transform.position.x < AgentRigidbody.transform.position.x) && AgentRigidbody.transform.position.x > xPatrolStart)
-        {
-            AgentRigidbody.velocity = new Vector2(1 * runSpeed, AgentRigidbody.velocity.y);
-        }
-    }
-
-    private void MoveToPlayer()
-    {
-        MeleeHitBox.enabled = false;
-
-        if (Mathf.Abs(player.transform.position.x - AgentRigidbody.transform.position.x) < 1.5)
-        {
-            Attack();    
-            return;
-        }
-        if ((player.transform.position.x > AgentRigidbody.transform.position.x) && AgentRigidbody.transform.position.x < xPatrolStop)
-        {
-            AgentRigidbody.velocity = new Vector2(1 * runSpeed, AgentRigidbody.velocity.y);
-            Flip(1);
-        }
-        if ((player.transform.position.x < AgentRigidbody.transform.position.x) && AgentRigidbody.transform.position.x > xPatrolStart)
-        {
-            AgentRigidbody.velocity = new Vector2(-1 * runSpeed, AgentRigidbody.velocity.y);
-            Flip(-1);
-        }
-        //speed is a parameter needed for unity to know when to transition from idle to run animation and vice versa
-        AgentAnimator.SetFloat("speed", 1);
-
+        return false;
     }
 
     private bool LookForPlayer()
@@ -110,25 +109,7 @@ public abstract class Agent : MonoBehaviour {
         return false;
     }
 
-    private void AgentPatrol()
-    {
-        if (facingRight && AgentRigidbody.transform.position.x < xPatrolStop)
-            AgentRigidbody.velocity = new Vector2(1 * patrolSpeed, AgentRigidbody.velocity.y);
-        if (!facingRight && AgentRigidbody.transform.position.x > xPatrolStart)
-            AgentRigidbody.velocity = new Vector2(-1 * patrolSpeed, AgentRigidbody.velocity.y);
-        if (AgentRigidbody.transform.position.x >= xPatrolStop)
-        {
-            Flip(-1);
-        }
-        if (AgentRigidbody.transform.position.x <= xPatrolStart)
-        {
-            Flip(1);
-        }
-        //speed is a parameter needed for unity to know when to transition from idle to run animation and vice versa
-        AgentAnimator.SetFloat("speed", 1);
-    }
-
-    private void Flip(float direction)
+    public void Flip(float direction)
     {
         if ((direction > 0 && !facingRight) || (direction < 0 && facingRight))
         {
@@ -177,12 +158,5 @@ public abstract class Agent : MonoBehaviour {
     }
 
 
-    private void Attack()
-    { 
-        //otherwise just attack
-        MeleeHitBox.enabled = true;
-        AgentRigidbody.velocity = new Vector2((float)0.000001, AgentRigidbody.velocity.y);  //Need a tiny velocity to trigger the OnTriggerEnter event in Agent.
-        AgentRigidbody.velocity = new Vector2(0, AgentRigidbody.velocity.y);
-        RecentlyAttacked = true;
-    }
+
 }

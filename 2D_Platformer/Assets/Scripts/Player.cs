@@ -233,7 +233,7 @@ public class Player : MonoBehaviour {
         {
             SpriteFlicker();
             ImmunityTime += Time.deltaTime;
-            if (ImmunityTime > 2)
+            if (ImmunityTime > 1)
             {
                 Immunity = false;
                 PlayerSpriteRenderer.enabled = true;

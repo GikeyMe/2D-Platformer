@@ -46,23 +46,22 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Scripts\Agent.cs" />
+     <Compile Include="Assets\Scripts\AgentStates\ChaseState.cs" />
+     <Compile Include="Assets\Scripts\AgentStates\IAgentState.cs" />
+     <Compile Include="Assets\Scripts\AgentStates\IdleState.cs" />
+     <Compile Include="Assets\Scripts\AgentStates\MeleeAttackState.cs" />
+     <Compile Include="Assets\Scripts\AgentStates\PatrolState.cs" />
      <Compile Include="Assets\Scripts\Bullet.cs" />
      <Compile Include="Assets\Scripts\Camera.cs" />
      <Compile Include="Assets\Scripts\CollisionTrigger.cs" />
      <Compile Include="Assets\Scripts\MovingPlatform.cs" />
      <Compile Include="Assets\Scripts\Player.cs" />
      <Compile Include="Assets\Scripts\Slime.cs" />
- <Reference Include="UnityEngine.Advertisements">
- <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/Advertisements/UnityEngine.Advertisements.dll</HintPath>
- </Reference>
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.Networking">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/Networking/UnityEngine.Networking.dll</HintPath>
- </Reference>
- <Reference Include="UnityEngine.Analytics">
- <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/UnityAnalytics/UnityEngine.Analytics.dll</HintPath>
  </Reference>
  <Reference Include="Mono.Cecil">
  <HintPath>C:/Program Files/Unity/Editor/Data/Managed/Mono.Cecil.dll</HintPath>
