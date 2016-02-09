@@ -7,9 +7,13 @@ public class MovingPlatform : MonoBehaviour {
     [SerializeField]
     private float moveSpeed;
     [SerializeField]
-    private float LowestPoint;
+    private float StartPoint;
     [SerializeField]
-    private float HighestPoint;
+    private float StopPoint;
+    [SerializeField]
+    private bool MoveAlongX;
+    [SerializeField]
+    private bool MoveAlongY;
 
     // Use this for initialization
     void Start () {
@@ -23,9 +27,27 @@ public class MovingPlatform : MonoBehaviour {
 
     private void movePlatform()
     {
-        if (PlatformRigidbody.transform.position.y < LowestPoint)
-            PlatformRigidbody.velocity = new Vector2(PlatformRigidbody.velocity.x, 1 * moveSpeed);
-        if (PlatformRigidbody.transform.position.y > HighestPoint)
-            PlatformRigidbody.velocity = new Vector2(PlatformRigidbody.velocity.x, -1 * moveSpeed);
+        if (MoveAlongY)
+        {
+            if (PlatformRigidbody.transform.position.y > StartPoint)
+            {
+                PlatformRigidbody.velocity = new Vector2(PlatformRigidbody.velocity.x, -1 * moveSpeed);
+            }
+            if (PlatformRigidbody.transform.position.y < StopPoint)
+            {
+                PlatformRigidbody.velocity = new Vector2(PlatformRigidbody.velocity.x, 1 * moveSpeed);
+            }
+        }
+        if (MoveAlongX)
+        {
+            if (PlatformRigidbody.transform.position.x > StartPoint)
+            {
+                PlatformRigidbody.velocity = new Vector2(-1 * moveSpeed, PlatformRigidbody.velocity.y);
+            }
+            if (PlatformRigidbody.transform.position.x < StopPoint)
+            {
+                PlatformRigidbody.velocity = new Vector2(1 * moveSpeed, PlatformRigidbody.velocity.y);
+            }
+        }
     }
 }

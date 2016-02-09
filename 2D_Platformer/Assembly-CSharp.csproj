@@ -47,16 +47,25 @@
   <ItemGroup>
      <Compile Include="Assets\Scripts\Agent.cs" />
      <Compile Include="Assets\Scripts\AgentStates\ChaseState.cs" />
+     <Compile Include="Assets\Scripts\AgentStates\HideState.cs" />
      <Compile Include="Assets\Scripts\AgentStates\IAgentState.cs" />
      <Compile Include="Assets\Scripts\AgentStates\IdleState.cs" />
      <Compile Include="Assets\Scripts\AgentStates\MeleeAttackState.cs" />
      <Compile Include="Assets\Scripts\AgentStates\PatrolState.cs" />
+     <Compile Include="Assets\Scripts\Bat.cs" />
+     <Compile Include="Assets\Scripts\Boss.cs" />
+     <Compile Include="Assets\Scripts\BossKnife.cs" />
      <Compile Include="Assets\Scripts\Bullet.cs" />
      <Compile Include="Assets\Scripts\Camera.cs" />
      <Compile Include="Assets\Scripts\CollisionTrigger.cs" />
+     <Compile Include="Assets\Scripts\ExitDoor.cs" />
+     <Compile Include="Assets\Scripts\LevelTransition.cs" />
+     <Compile Include="Assets\Scripts\Lever.cs" />
      <Compile Include="Assets\Scripts\MovingPlatform.cs" />
      <Compile Include="Assets\Scripts\Player.cs" />
      <Compile Include="Assets\Scripts\Slime.cs" />
+     <Compile Include="Assets\Scripts\Worm.cs" />
+     <Compile Include="Assets\asd.cs" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>

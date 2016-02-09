@@ -22,15 +22,14 @@ public class MeleeAttackState : IAgentState
     public void Act()
     {
         currentAgent.MeleeHitBox.enabled = false;
-        if (RecentlyAttacked)
-        {
-            MoveFromPlayer();
-        }
-        else
-        {
-            Attack();
-        }
-
+            if (RecentlyAttacked && (!(currentAgent is Worm)))
+            {
+                MoveFromPlayer();
+            }
+            else
+            {
+                Attack();
+            }
     }
 
     private void MoveFromPlayer()
@@ -39,11 +38,11 @@ public class MeleeAttackState : IAgentState
         {
             RecentlyAttacked = false;
         }
-        if ((player.transform.position.x > AgentRigidbody.transform.position.x) && AgentRigidbody.transform.position.x < currentAgent.getxPatrolStop())
+        if ((player.transform.position.x > AgentRigidbody.transform.position.x) && AgentRigidbody.transform.position.x > currentAgent.getxPatrolStart())
         {
             AgentRigidbody.velocity = new Vector2(-1 * currentAgent.getrunSpeed(), AgentRigidbody.velocity.y);
         }
-        if ((player.transform.position.x < AgentRigidbody.transform.position.x) && AgentRigidbody.transform.position.x > currentAgent.getxPatrolStart())
+        if ((player.transform.position.x < AgentRigidbody.transform.position.x) && AgentRigidbody.transform.position.x < currentAgent.getxPatrolStop())
         {
             AgentRigidbody.velocity = new Vector2(1 * currentAgent.getrunSpeed(), AgentRigidbody.velocity.y);
         }
@@ -61,14 +60,24 @@ public class MeleeAttackState : IAgentState
             AgentRigidbody.velocity = new Vector2(-1 * currentAgent.getrunSpeed(), AgentRigidbody.velocity.y);
             currentAgent.Flip(-1);
         }
-        //speed is a parameter needed for unity to know when to transition from idle to run animation and vice versa
-        AgentAnimator.SetFloat("speed", 1);
-    }
+
+        if (currentAgent is Slime || currentAgent is Worm)
+        {
+            //speed is a parameter needed for unity to know when to transition from idle to run animation and vice versa
+            AgentAnimator.SetFloat("speed", 1);
+        }
+    } 
 
     private void Attack()
     {
         if (Mathf.Abs(player.transform.position.x - AgentRigidbody.transform.position.x) < 1.5)
         {
+            //trigger worm melee animation.
+            if (currentAgent is Worm)
+            {
+                AgentAnimator.SetTrigger("Melee");
+                return;
+            }
             currentAgent.MeleeHitBox.enabled = true;
             AgentRigidbody.velocity = new Vector2((float)0.000001, AgentRigidbody.velocity.y);  //Need a tiny velocity to trigger the OnTriggerEnter event in Player.
             AgentRigidbody.velocity = new Vector2(0, AgentRigidbody.velocity.y);

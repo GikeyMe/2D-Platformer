@@ -97,3 +97,94 @@ representing a state the AI might need to be in. (IdleState, PatrolState, ChaseS
 decides which state it should be in, and then the concrete implementation of state deals with how the agent should act.
 
 This should help keep code for each different state seperated and clearer in the long run.
+
+
+27th January 2016
+-----------------
+Finished collision entirely for first level. Some adjustments may still be necessary but all colliders are now in place for ground walls ceilings and platforms.
+
+Added the "Bat" to the game. This involved creating 3 animations (fly, damage and death). The Bat script inherits from Agent, and of course makes use of
+the State machine for it's AI in the same way the Slime agent does.
+
+The notable difference between the Bat AI and the Slime AI is that I want the bat to be able to chase the player across the whole level, whereas a slime will
+give up if the player leaves the area between it's two patrol points.
+
+To do this I needed to override some agent methods in the bat class. Firstly I wanted to override the PlayerMeleeRange method to make it check the Y coordinates
+of the player and the agent before letting the bat attack as the bat flies obviously. However after doing this I noticed that the slime AI switches between
+patrol and melee states even when the player is nowhere near and this is caused by the Slime not checking the Y values of the player. This really was quite
+and obvious bug but I caught it, and decided that instead of overriding the method in bat to check the Y, that the base functionality should check the Y
+value so I simply modified the method inside the Agent class instead.
+
+Next I needed to override the  Agent LookForPlayer method in Bat to allow the bats to search further along the Y axis for the player, this allows them to 
+enter the chase state more easily as intended.
+
+The next thing I needed to do was ensure that the bats and slimes chased in different ways. It occurred to me that I could have the functionality in each
+of their respective classes and then call that procedure from the ChaseState class, but after some thought I felt like the whole point of the state machine
+pattern is to minimize action functionality inside the respective agent's class. So instead, I simply checked which kind of agent the ChaseState class was
+dealing with, and altered functionality based on that.
+
+The main difference is that the Bat now also tries to chase the player along the Y axis. This works fairly well at the moment but unfortunately the bat gets
+stuck on obstacles.
+
+After some research it seems that pathfinding is the answer to this problem. I might attempt to implement some sort of pathfinding at a later date if the 
+problem is not resolved by then.
+
+
+28th January 2016
+------------------
+Added the third AI today. The "Worm" AI. This involved creating all of the animations, (Idle, walk, damage, death and attack.) As this was the first enemy
+sprite that had an attack animation included, I needed to add some new code to the MeleeAttack state in order for it to work correctly (i.e I wanted to 
+trigger the attack animation rather than just have the mob bounce off the player like the Bat and Slime did.) This also meant that enabling and disabling
+the HitBox needed to be triggered by animation events in much the same way the player's melee hit box is triggered when it attacks.
+
+As this is a melee mob, in order to make the AI unique from the slime, I added functionality for it to hide from the player if the player is nearby and out of
+reach. The reasoning behind this is that if the player is stood on another platform where the Worm is unable to reach (because it can't jump). Then the worm
+is at risk of being shot. So in this scenario it attempts to hide by running away to the other end of it's patrol point. This hopefully removes it from the 
+player's view so that bullets despawn before reaching the agent. If the player then steps onto the agents platform, the worm will chase the player and attempt
+to melee attack him.
+
+This involved creating a new state, HideState, which the Worm enters if the player is nearby but out of reach.
+
+29th January 2016
+------------------
+Platforms Powerups and Ladders. Still to do levers and door.
+
+
+1st February 2016
+------------------
+Added scripts for levers , door and level transition.
+
+Today I added the levers, switches and exit door to the game. Each of these required animations. The switches are simply to signify whether or not the 
+corresponding lever has been pulled. This is so the player can use their intuition to figure out that the door needs to be unlocked and that pulling levers
+is the way to do that. Each lever has a script attached to control their animation, if the player presses the "Use" key (which temporarily spawns a box 
+collider infront of him, much like a melee attack) near the lever, it plays the animation for the lever being pulled.
+
+I also attached a script to the door which controls the animation for the door and the switches. This script constantly checks the status of the levers and if
+it sees that a lever has been pulled, it switches on the corresponding switch. If both switches are on, it plays the door open animation, and activates it's
+level transition trigger. This trigger has the LevelTransition script attached to it which basically checks to see if the player is inside the trigger,
+and if the player is inside and also presses the "w" key, the script will load the next level.
+
+8th February 2016
+------------------
+Created the level for the first boss fight. This is a simplistic level as the only challenge I really want to present the player with here is the boss itself.
+Also I don't want their to be a great deal of obstacles for the boss. As such the level is flat with just a few spike obstacles for the player and boss
+to navigate.
+
+9th February 2016
+-----------------
+Today I created the boss agent. I used a player sprite from another sprite package as this means there are a great deal of animations I can use for the boss,
+meaning I can make it do more complex things as there are animations to support it.
+
+Today I added animations for Idling, running, melee attack, knife throwing, taking damage, jumping and falling.
+
+Most of these were fairly simple as I have already done it multiple times for other agents, but knife throwing was fairly difficult as it hasn't been done
+before. I followed a similar process to how I implemented shooting for the player and this worked successfully. I spent alot of time on this as originally the
+knife was spawning inside of the boss' hitbox, hitting the inside edge of it and then despawning. This made it appear to me as if the knife wasn't spawning
+at all so I spent a great deal of time looking for mistakes in the code when really the problem was as simple as the position the knife is spawning in at.
+
+The next big challenge was to get jumping working for the boss. Again I implemented this in a way that is similar to the player jump. The boss checks if it
+is on the ground, and if so weights the ground layer to be in control, if it is in the air however, it weights the air layer to be in control of animation.
+Currently the code for the boss just causes him to jump constantly, this will be changed tomorrow. I will also likely created a RangedAttackState and a JumpState
+tomorrow for more code reuse and better readability. 
+
+I intend to use a trigger near the spike obstacles to let the boss agent know when he needs to jump.

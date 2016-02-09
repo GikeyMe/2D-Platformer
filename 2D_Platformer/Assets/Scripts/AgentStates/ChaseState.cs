@@ -20,18 +20,43 @@ public class ChaseState : IAgentState
 
     public void Act()
     {
-        if ((player.transform.position.x > AgentRigidbody.transform.position.x) && AgentRigidbody.transform.position.x < currentAgent.getxPatrolStop())
+        if (currentAgent is Slime || currentAgent is Worm)
         {
-            AgentRigidbody.velocity = new Vector2(1 * currentAgent.getrunSpeed(), AgentRigidbody.velocity.y);
-            currentAgent.Flip(1);
+            if ((player.transform.position.x > AgentRigidbody.transform.position.x) && AgentRigidbody.transform.position.x < currentAgent.getxPatrolStop())
+            {
+                AgentRigidbody.velocity = new Vector2(1 * currentAgent.getrunSpeed(), AgentRigidbody.velocity.y);
+                currentAgent.Flip(1);
+            }
+            if ((player.transform.position.x < AgentRigidbody.transform.position.x) && AgentRigidbody.transform.position.x > currentAgent.getxPatrolStart())
+            {
+                AgentRigidbody.velocity = new Vector2(-1 * currentAgent.getrunSpeed(), AgentRigidbody.velocity.y);
+                currentAgent.Flip(-1);
+            }
+            //speed is a parameter needed for unity to know when to transition from idle to run animation and vice versa
+            AgentAnimator.SetFloat("speed", 1);
         }
-        if ((player.transform.position.x < AgentRigidbody.transform.position.x) && AgentRigidbody.transform.position.x > currentAgent.getxPatrolStart())
+
+        else if (currentAgent is Bat)
         {
-            AgentRigidbody.velocity = new Vector2(-1 * currentAgent.getrunSpeed(), AgentRigidbody.velocity.y);
-            currentAgent.Flip(-1);
+            if (player.transform.position.x > AgentRigidbody.transform.position.x)
+            {
+                AgentRigidbody.velocity = new Vector2(1 * currentAgent.getrunSpeed(), AgentRigidbody.velocity.y);
+                currentAgent.Flip(1);
+            }
+            if (player.transform.position.x < AgentRigidbody.transform.position.x)
+            {
+                AgentRigidbody.velocity = new Vector2(-1 * currentAgent.getrunSpeed(), AgentRigidbody.velocity.y);
+                currentAgent.Flip(-1);
+            }
+            if ((player.transform.position.y - AgentRigidbody.transform.position.y) < -2)
+            {
+                AgentRigidbody.velocity = new Vector2(AgentRigidbody.velocity.x, -1 * currentAgent.getrunSpeed());
+            }
+            if ((player.transform.position.y - AgentRigidbody.transform.position.y) > 2)
+            {
+                AgentRigidbody.velocity = new Vector2(AgentRigidbody.velocity.x, 1 * currentAgent.getrunSpeed());
+            }
         }
-        //speed is a parameter needed for unity to know when to transition from idle to run animation and vice versa
-        AgentAnimator.SetFloat("speed", 1);
     }
 
 

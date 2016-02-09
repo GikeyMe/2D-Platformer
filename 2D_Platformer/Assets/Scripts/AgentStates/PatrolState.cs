@@ -30,8 +30,12 @@ public class PatrolState : IAgentState
         {
             currentAgent.Flip(1);
         }
-        //speed is a parameter needed for unity to know when to transition from idle to run animation and vice versa
-        AgentAnimator.SetFloat("speed", 1);
+
+        if (currentAgent is Slime  || currentAgent is Worm)
+        {
+            //speed is a parameter needed for unity to know when to transition from idle to run animation and vice versa
+            AgentAnimator.SetFloat("speed", 1);
+        }
     }
 
 

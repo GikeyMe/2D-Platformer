@@ -4,8 +4,8 @@ using System.Collections;
 public abstract class Agent : MonoBehaviour {
 
     private bool facingRight;
-    private Animator AgentAnimator;
-    private Rigidbody2D AgentRigidbody;
+    protected Animator AgentAnimator;
+    protected Rigidbody2D AgentRigidbody;
     [SerializeField]
     private float runSpeed;
     [SerializeField]
@@ -15,15 +15,15 @@ public abstract class Agent : MonoBehaviour {
     [SerializeField]
     private float xPatrolStop;
     [SerializeField]
-    private bool Patrol;
+    protected bool Patrol;
     [SerializeField]
     public BoxCollider2D MeleeHitBox;
-    private bool PlayerNearby;
-    private GameObject player;
+    
+    protected GameObject player;
 
-    private IAgentState activeState;
+    protected IAgentState activeState;
     [SerializeField]
-    protected int hitpoints;
+    private int hitpoints;
 
 
 
@@ -52,14 +52,14 @@ public abstract class Agent : MonoBehaviour {
         return xPatrolStop;
     }
 
-    private void SetState(IAgentState State)
+    protected void SetState(IAgentState State)
     {
         activeState = State;
         activeState.Activate(this);                  // pass the agent that is changing states to the necessary state
     }
 
-    // Use this for initialization
-   protected virtual void Start () {
+    protected virtual void Start()
+    {
         SetState(new IdleState());
         facingRight = true;                              //we know the slime starts off facing right so set this to true
         AgentRigidbody = GetComponent<Rigidbody2D>();   //Get the Rigidbody2D and Animator objects from unity
@@ -67,43 +67,26 @@ public abstract class Agent : MonoBehaviour {
         player = GameObject.Find("Player");
     }
 
-    protected virtual void Update()
-    {       
-        if (Alive())
-        {
-            PlayerNearby = LookForPlayer();
-            if (!Patrol && !PlayerNearby && !(activeState is IdleState))
-                SetState(new IdleState());
-            else if (Patrol && !PlayerNearby && !(activeState is PatrolState))
-                SetState(new PatrolState());
-            else if (PlayerMeleeRange() && !(activeState is MeleeAttackState))
-                SetState(new MeleeAttackState());         
-            else if (PlayerNearby && !PlayerMeleeRange() && !(activeState is ChaseState))
-                SetState(new ChaseState());
-
-            activeState.Act();
-        }
-    }
-
-    private bool Alive()
+    protected bool Alive()
     {
         return hitpoints > 0;
     }
 
-    private bool PlayerMeleeRange()
+    //override as we need to also check y values for bat because it can fly.
+    protected bool PlayerMeleeRange()
     {
-        if (Mathf.Abs(player.transform.position.x - AgentRigidbody.transform.position.x) < 3.1)
+        if ((Mathf.Abs(player.transform.position.x - AgentRigidbody.transform.position.x) < 3.1) && (Mathf.Abs(player.transform.position.y - AgentRigidbody.transform.position.y) < 2.2))
         {
             return true;
         }
         return false;
     }
 
-    private bool LookForPlayer()
+    protected virtual bool LookForPlayer()
     {
-        if (Mathf.Abs(GameObject.Find("Player").transform.position.x - AgentRigidbody.transform.position.x) < 30)
+        if (Mathf.Abs(player.transform.position.x - AgentRigidbody.transform.position.x) < 25)
         {
-            if (Mathf.Abs(GameObject.Find("Player").transform.position.y - AgentRigidbody.transform.position.y) < 10)
+            if (Mathf.Abs(player.transform.position.y - AgentRigidbody.transform.position.y) < 3)
                 return true;
         }
         return false;
@@ -155,6 +138,35 @@ public abstract class Agent : MonoBehaviour {
     private void DestroyAgent()
     {
         Destroy(gameObject);
+    }
+
+    private void ActivateGravity()
+    {
+        AgentRigidbody.gravityScale = 8;
+    }
+
+    private void EnableHitBox()
+    {
+        MeleeHitBox.enabled = true;
+        AgentRigidbody.velocity = new Vector2((float)0.000001, AgentRigidbody.velocity.y);  //Need a tiny velocity to trigger the OnTriggerEnter event in Player.
+        AgentRigidbody.velocity = new Vector2(0, AgentRigidbody.velocity.y);
+    }
+
+    private void DisableHitBox()
+    {
+        MeleeHitBox.enabled = false;
+    }
+
+    private bool canAgentFly()
+    {
+        return (this is Bat);
+    }
+
+    protected bool IsPlayerReachable()
+    {
+        if (((player.transform.position.x < xPatrolStart-1.5) || (player.transform.position.x > xPatrolStop+1.5)) && (!(canAgentFly())))
+            return false;
+        return true;
     }
 
 

@@ -42,9 +42,19 @@ public class Player : MonoBehaviour {
     [SerializeField]
     private BoxCollider2D MeleeHitbox;
 
+    [SerializeField]
+    private BoxCollider2D Usebox;
+
     private bool Immunity;
     private float ImmunityTime;
     private float FlickerTime;
+
+    private bool JumpPowerUp;
+    private float PowerUpTime;
+
+    private Color originalColor;
+
+    private bool OnLadder;
 
 
 
@@ -56,6 +66,7 @@ public class Player : MonoBehaviour {
         PlayerRigidbody = GetComponent<Rigidbody2D>();   //Get the Rigidbody2D and Animator objects from unity
         PlayerAnimator = GetComponent<Animator>();
         PlayerSpriteRenderer = GetComponent<SpriteRenderer>();
+        originalColor = PlayerSpriteRenderer.color;
 
         platform = GameObject.Find("MovingPlatform");                     //Add the first (non numbered) MovingPlatform to the arraylist if it exists.
         if (platform != null)
@@ -82,6 +93,7 @@ public class Player : MonoBehaviour {
         OnMovingPlat = IsPlayerOnMovingPlatform();
         float horizontal = Input.GetAxis("Horizontal"); //Unity already has keybinds set up for right and left movement. GetAxis returns a float representing the direction the player is inputting.
         UpdateImmunity();
+        UpdatePowerUp();
         PlayerMovement(horizontal);  // handle player movement
         Flip(horizontal);            // do we need to flip the sprite?
         HandleLayers();
@@ -101,7 +113,7 @@ public class Player : MonoBehaviour {
             PlayerRigidbody.velocity = Vector2.zero; //stop movement on all axes while animation plays
         }
 
-        if (Input.GetKeyDown(KeyCode.Space) && onGround)  //if the player presses space and we aren't already jumping or falling
+        if (Input.GetKeyDown(KeyCode.Space) && (onGround || JumpPowerUp))  //if the player presses space and we aren't already jumping or falling
         {
                 onGround = false;
                 PlayerRigidbody.AddForce(new Vector2(0, jumpSpeed));    // make the player character jump (i.e apply a positive force on the y axis)
@@ -116,6 +128,15 @@ public class Player : MonoBehaviour {
         if (Input.GetKeyUp(KeyCode.LeftControl))
         {
             PlayerAnimator.SetBool("Shooting", false);
+        }
+        
+        if(Input.GetKeyDown(KeyCode.E))
+        {
+            Usebox.enabled = true;
+        }
+        if (Input.GetKeyUp(KeyCode.E))
+        {
+            Usebox.enabled = false;
         }
     }
 
@@ -144,12 +165,17 @@ public class Player : MonoBehaviour {
         if (!this.PlayerAnimator.GetCurrentAnimatorStateInfo(0).IsTag("Melee") && (onGround || airMovement)) //if we aren't already playing melee animation and we aren't jumping or falling,
         {                                                                                                   // then we are allowed to move horizontally
             PlayerRigidbody.velocity = new Vector2(horizontal * runSpeed, PlayerRigidbody.velocity.y);
+            //speed is a parameter needed for unity to know when to transition from idle to run animation and vice versa
+            PlayerAnimator.SetFloat("speed", Mathf.Abs(horizontal));  // we don't want a negative value so use Mathf.Abs
+        }  
+
+        if(OnLadder)
+        {
+            PlayerRigidbody.velocity = new Vector2(PlayerRigidbody.velocity.x, Input.GetAxisRaw("Vertical") * runSpeed);
+            PlayerAnimator.SetFloat("ClimbSpeed", Mathf.Abs(Input.GetAxisRaw("Vertical")) * runSpeed);
         }
-
-
-        //speed is a parameter needed for unity to know when to transition from idle to run animation and vice versa
-        PlayerAnimator.SetFloat("speed", Mathf.Abs(horizontal));  // we don't want a negative value so use Mathf.Abs
     }
+
 
     private void Flip(float horizontal)
     {
@@ -242,6 +268,38 @@ public class Player : MonoBehaviour {
         }
     }
 
+    private void UpdatePowerUp()
+    {
+        if (JumpPowerUp)
+        {
+            PowerUpTime += Time.deltaTime;
+            if (PowerUpTime > 12)
+                PowerUpFlicker();
+            if (PowerUpTime > 15)
+            {
+                JumpPowerUp = false;
+                PlayerSpriteRenderer.color = originalColor;
+                PowerUpTime = 0;
+            }
+        }
+    }
+
+    private void PowerUpFlicker()
+    {
+        if (FlickerTime < 0.1)
+        {
+            FlickerTime += Time.deltaTime;
+        }
+        else if (FlickerTime >= 0.1)
+        {
+            if (PlayerSpriteRenderer.color == Color.red)
+                PlayerSpriteRenderer.color = originalColor;
+            else
+                PlayerSpriteRenderer.color = Color.red;
+            FlickerTime = 0;
+        }
+    }
+
     private void SpriteFlicker()
     {
         if(FlickerTime < 0.1)
@@ -253,7 +311,6 @@ public class Player : MonoBehaviour {
             PlayerSpriteRenderer.enabled = !PlayerSpriteRenderer.enabled;
             FlickerTime = 0;
         }
-
     }
 
     public void TakeDamage(int hp)
@@ -294,12 +351,45 @@ public class Player : MonoBehaviour {
                 TakeDamage(20);
             }
 
+            if (EnterredObject.tag == "BatMelee")
+            {
+                TakeDamage(20);
+            }
+
+            if (EnterredObject.tag == "WormMelee")
+            {
+                TakeDamage(20);
+            }
+
             if (EnterredObject.gameObject.name == ("SpikeTrigger"))
             {
                 TakeDamage(100);
             }
+
+            if(EnterredObject.tag == "Diamond")
+            {
+                JumpPowerUp = true;
+                PlayerSpriteRenderer.color = Color.red;
+            }
+
+            if(EnterredObject.tag == "Ladder")
+            {
+                OnLadder = true;
+                PlayerRigidbody.gravityScale = 0;
+                PlayerAnimator.SetBool("OnLadder", true);
+            }
         }
         
+    }
+
+    private void OnTriggerExit2D(Collider2D ExitObject)
+    {
+        if(ExitObject.tag == "Ladder")
+        {
+            OnLadder = false;
+            PlayerRigidbody.gravityScale = 8;
+            PlayerAnimator.SetBool("OnLadder", false);
+        }
     }
 
     private bool Alive()
