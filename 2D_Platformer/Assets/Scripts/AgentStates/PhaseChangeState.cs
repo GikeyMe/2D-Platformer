@@ -2,26 +2,24 @@
 using System.Collections;
 using System;
 
-public class IdleState : IAgentState
-{
+public class PhaseChangeState : IAgentState {
+
     private Agent currentAgent;
     private Rigidbody2D AgentRigidbody;
     private Animator AgentAnimator;
 
     public void Activate(Agent agent)
     {
+        Debug.Log("PhaseChangeState");
         currentAgent = agent;
         AgentRigidbody = currentAgent.GetComponent<Rigidbody2D>();
         AgentAnimator = currentAgent.GetComponent<Animator>();
-        Debug.Log("Idle State");
     }
 
     public void Act()
-    {
-        if (currentAgent is Slime  || currentAgent is Worm || currentAgent is Boss)
-        {
-            if (AgentRigidbody.velocity.x == 0)
-                AgentAnimator.SetFloat("speed", 0);
-        }
+    {        
+        currentAgent.Flip(1);
+        AgentRigidbody.velocity = new Vector2(2 * currentAgent.getrunSpeed(), AgentRigidbody.velocity.y);  // run right towards next platform
+        AgentAnimator.SetFloat("speed", 1);
     }
 }

@@ -52,6 +52,8 @@
      <Compile Include="Assets\Scripts\AgentStates\IdleState.cs" />
      <Compile Include="Assets\Scripts\AgentStates\MeleeAttackState.cs" />
      <Compile Include="Assets\Scripts\AgentStates\PatrolState.cs" />
+     <Compile Include="Assets\Scripts\AgentStates\PhaseChangeState.cs" />
+     <Compile Include="Assets\Scripts\AgentStates\RangedAttackState.cs" />
      <Compile Include="Assets\Scripts\Bat.cs" />
      <Compile Include="Assets\Scripts\Boss.cs" />
      <Compile Include="Assets\Scripts\BossKnife.cs" />

@@ -188,3 +188,34 @@ Currently the code for the boss just causes him to jump constantly, this will be
 tomorrow for more code reuse and better readability. 
 
 I intend to use a trigger near the spike obstacles to let the boss agent know when he needs to jump.
+
+
+10th February 2016
+-------------------
+Today I wrote the main logic for the boss. This involved creating two new scripts. The RangedAttackState and the PhaseChangeState. RangedAttack will likely
+be used quite alot in the future for any mobs in subsequent levels that need to be able to use ranged attacks.
+
+I wanted the boss fight to start off in melee combat, then once the boss has lost a certain amount of health, I wanted him to jump to another platform and
+begin throwing knives at the player. To do this I needed to use phases. The first "phase" being the melee phase. The second phase being the ranged phase.
+So whilst the boss is in the first phase, he uses certain logic to decide which state he needs to be in. While in the second phase he uses different logic
+and has a different set of states to choose from. 
+
+To elaborate, in phase one the boss can choose from "IdleState" "PatrolState" "MeleeAttackState", "PhaseChangeState" and "ChaseState". While in phase two 
+the boss can choose from "PhaseChangeState", "MeleeAttackState" and "RangedAttackState".
+
+The actual code logic uses four phases, this is due to the fact that there are four platforms in the level but I will likely try to tidy up /simplify
+this logic in the future.
+
+For the boss to be able to jump across platforms I used a trigger near the edge of the platform that notifies him that he needs to perform a jump. Once he 
+is on the platform I use another trigger to notify the Boss that it has successfully enterred the next phase, so it needs to use the logic for the next 
+phase.
+
+This caused a bug as his throwing knives were originally coded to despawn when they collide with a trigger. I made changes to this code so that they would 
+ignore the phase and jump triggers.
+
+I tuned up the damage of the throwing knives from 10 to 20 and slowed their speed down because it is more fun if enemy attacks hit harder but are avoidable
+as this rewards skillful play.
+
+There is currently a bug where when the boss changes phases his animation doesn't make the switch from melee to run fast enough.
+
+I Still need to write the code for when the boss reaches 0 hp, the door opens and he runs away.

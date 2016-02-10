@@ -22,7 +22,7 @@ public class MeleeAttackState : IAgentState
     public void Act()
     {
         currentAgent.MeleeHitBox.enabled = false;
-            if (RecentlyAttacked && (!(currentAgent is Worm)))
+            if (RecentlyAttacked && (!(currentAgent is Worm) && !(currentAgent is Boss)))
             {
                 MoveFromPlayer();
             }
@@ -50,6 +50,7 @@ public class MeleeAttackState : IAgentState
 
     private void MoveToPlayer()
     {
+        //checking patrol bounds doesn't make sense for bat and boss however they seem to be working even with this code in place.
         if ((player.transform.position.x > AgentRigidbody.transform.position.x) && AgentRigidbody.transform.position.x < currentAgent.getxPatrolStop())
         {
             AgentRigidbody.velocity = new Vector2(1 * currentAgent.getrunSpeed(), AgentRigidbody.velocity.y);
@@ -61,7 +62,7 @@ public class MeleeAttackState : IAgentState
             currentAgent.Flip(-1);
         }
 
-        if (currentAgent is Slime || currentAgent is Worm)
+        if (currentAgent is Slime || currentAgent is Worm || currentAgent is Boss)
         {
             //speed is a parameter needed for unity to know when to transition from idle to run animation and vice versa
             AgentAnimator.SetFloat("speed", 1);
@@ -70,10 +71,10 @@ public class MeleeAttackState : IAgentState
 
     private void Attack()
     {
-        if (Mathf.Abs(player.transform.position.x - AgentRigidbody.transform.position.x) < 1.5)
+        if ((Mathf.Abs(player.transform.position.x - AgentRigidbody.transform.position.x) < 1.5) || (currentAgent is Boss && Mathf.Abs(player.transform.position.x - AgentRigidbody.transform.position.x) < 3.0))
         {
             //trigger worm melee animation.
-            if (currentAgent is Worm)
+            if (currentAgent is Worm || currentAgent is Boss)
             {
                 AgentAnimator.SetTrigger("Melee");
                 return;

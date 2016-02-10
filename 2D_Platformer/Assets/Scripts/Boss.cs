@@ -19,37 +19,131 @@ public class Boss : Agent {
     private float jumpSpeed;
 
     private bool onGround;
+    private bool PlayerNearby;
+    private bool FirstPhase;
+    private bool SecondPhase;
+    private bool ThirdPhase;
+    private bool FourthPhase;
+    private bool SecondPhaseReached;
+    private bool ThirdPhaseReached;
+    private bool FourthPhaseReached;
 
     // Use this for initialization
     protected override void Start () {
       //  onGround = CheckGrounded();
         base.Start();
+        FirstPhase = true;
 	}
-	
-	// Update is called once per frame
-	void Update () {
-        Debug.Log("Update On ground = " + onGround);
-        if ((onGround))  //if the player presses space and we aren't already jumping or falling
+
+    void Update()
+    {
+        if (hitpoints < 300 && !SecondPhaseReached)
         {
-            Debug.Log("Inside jump thing.");
-            onGround = false;
-            AgentRigidbody.AddForce(new Vector2(0, jumpSpeed));    // make the player character jump (i.e apply a positive force on the y axis)
-            AgentAnimator.SetTrigger("Jump");                         // Trigger the jump animation
-            Debug.Log("Applied Forces.");
+            FirstPhase = false;
+            SecondPhase = true;
         }
+        else if (hitpoints < 200 && !ThirdPhaseReached)
+        {
+            ThirdPhase = true;
+        }
+        else if (hitpoints < 100 && !FourthPhaseReached)
+        {
+            FourthPhase = true;
+        }
+
+        if (Alive())
+        {
+            if (FirstPhase)
+            {
+                PlayerNearby = LookForPlayer();
+                if (SecondPhase || ThirdPhase || FourthPhase)
+                {
+                    if(!(activeState is PhaseChangeState))
+                        SetState(new PhaseChangeState());
+                }
+                else if (!Patrol && !PlayerNearby && !(activeState is IdleState))
+                    SetState(new IdleState());                                          //can possibly remove idle and patrol states here.
+                else if (Patrol && !PlayerNearby && !(activeState is PatrolState))
+                    SetState(new PatrolState());
+                else if (PlayerMeleeRange() && !(activeState is MeleeAttackState))
+                    SetState(new MeleeAttackState());
+                else if (PlayerNearby && !PlayerMeleeRange() && !(activeState is ChaseState))
+                    SetState(new ChaseState());
+            }
+            else
+            {
+                if (SecondPhase || ThirdPhase || FourthPhase)
+                {
+                    if (!(activeState is PhaseChangeState))
+                        SetState(new PhaseChangeState());
+                }
+                else if (PlayerMeleeRange() && !(activeState is MeleeAttackState))
+                {
+                    AgentAnimator.SetBool("Throwing", false);
+                    SetState(new MeleeAttackState());                    
+                }
+                else if (!(activeState is RangedAttackState))
+                    SetState(new RangedAttackState());
+            }
+
+            activeState.Act();
+        }
+    }
+
+    public override void OnTriggerEnter2D(Collider2D EnterredObject)
+    {
+        if (EnterredObject.tag == "JumpNotify")
+            Jump();
+        if (EnterredObject.tag == "PhaseTwo")
+        {
+            SecondPhaseReached = true;
+            SecondPhase = false;
+            Debug.Log("Second Phase Reached.");
+            AgentAnimator.SetFloat("speed", 0);
+        }
+        if (EnterredObject.tag == "PhaseThree")
+        {
+            ThirdPhaseReached = true;
+            ThirdPhase = false;
+            AgentAnimator.SetFloat("speed", 0);
+        }
+        if (EnterredObject.tag == "PhaseFour")
+        {
+            FourthPhaseReached = true;
+            FourthPhase = false;
+            AgentAnimator.SetFloat("speed", 0);
+        }
+        base.OnTriggerEnter2D(EnterredObject);
+    }
+
+    protected override bool LookForPlayer()
+    {
+        if (Mathf.Abs(player.transform.position.x - AgentRigidbody.transform.position.x) < 40)
+        {
+            if (Mathf.Abs(player.transform.position.y - AgentRigidbody.transform.position.y) < 5)
+                return true;
+        }
+        return false;
     }
 
     void FixedUpdate()
     {       
         onGround = CheckGrounded();
-        Debug.Log("FixedUpdate On ground = " + onGround);
         if (AgentRigidbody.velocity.y < 0)  //if player character is falling and not on a moving platform
         {
-            Debug.Log("Set Falling to True");
             AgentAnimator.SetBool("Falling", true); //play falling animation. This can't be a trigger because we are unsure how far the player character is falling and so the animation has to be played 
         }                                            // until explicitly told to stop. (i.e boolean is false again)
-        Debug.Log("Call HandleLayers");
         HandleLayers();
+    }
+
+    private void Jump()
+    {
+        if ((onGround))  //if the player presses space and we aren't already jumping or falling
+        {
+            onGround = false;
+            AgentRigidbody.AddForce(new Vector2(0, jumpSpeed));    // make the player character jump (i.e apply a positive force on the y axis)
+            AgentAnimator.SetTrigger("Jump");                         // Trigger the jump animation
+        }
     }
 
     private bool CheckGrounded()
@@ -67,7 +161,6 @@ public class Boss : Agent {
                         AgentAnimator.ResetTrigger("Jump");
                         AgentAnimator.SetBool("Falling", false);  // we have finished falling (or we never were) so tell Unity we don't need to play the animation
                         return true;                            //then we are on the ground
-                        Debug.Log("We have finished falling so reset trigger and boolean");
                     }
                 }
             }

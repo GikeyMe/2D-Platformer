@@ -40,6 +40,8 @@ public class BossKnife : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D collision)
     {
+        if ((collision.tag == "PhaseTwo") || (collision.tag == "PhaseThree") || (collision.tag == "PhaseFour") || (collision.tag == "JumpNotify"))
+            return;
         Destroy(gameObject); //if bullets collide with anything else destroy them
     }
 }

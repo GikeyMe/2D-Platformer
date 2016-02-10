@@ -23,7 +23,7 @@ public abstract class Agent : MonoBehaviour {
 
     protected IAgentState activeState;
     [SerializeField]
-    private int hitpoints;
+    protected int hitpoints;
 
 
 
@@ -73,7 +73,7 @@ public abstract class Agent : MonoBehaviour {
     }
 
     //override as we need to also check y values for bat because it can fly.
-    protected bool PlayerMeleeRange()
+    protected virtual bool PlayerMeleeRange()
     {
         if ((Mathf.Abs(player.transform.position.x - AgentRigidbody.transform.position.x) < 3.1) && (Mathf.Abs(player.transform.position.y - AgentRigidbody.transform.position.y) < 2.2))
         {

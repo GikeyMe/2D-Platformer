@@ -36,6 +36,26 @@ public class ChaseState : IAgentState
             AgentAnimator.SetFloat("speed", 1);
         }
 
+        else if (currentAgent is Boss)
+        {
+            //should probably introduce similar check for worm so he cant move horizontally while playing attack animation.
+            if (!(AgentAnimator.GetCurrentAnimatorStateInfo(0).IsTag("Melee")))
+            {
+                if (player.transform.position.x > AgentRigidbody.transform.position.x)
+                {
+                    AgentRigidbody.velocity = new Vector2(1 * currentAgent.getrunSpeed(), AgentRigidbody.velocity.y);
+                    currentAgent.Flip(1);
+                }
+                if (player.transform.position.x < AgentRigidbody.transform.position.x)
+                {
+                    AgentRigidbody.velocity = new Vector2(-1 * currentAgent.getrunSpeed(), AgentRigidbody.velocity.y);
+                    currentAgent.Flip(-1);
+                }
+                //speed is a parameter needed for unity to know when to transition from idle to run animation and vice versa
+                AgentAnimator.SetFloat("speed", 1);
+            }
+        }
+
         else if (currentAgent is Bat)
         {
             if (player.transform.position.x > AgentRigidbody.transform.position.x)

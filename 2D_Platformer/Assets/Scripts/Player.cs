@@ -361,6 +361,16 @@ public class Player : MonoBehaviour {
                 TakeDamage(20);
             }
 
+            if(EnterredObject.tag == "BossMelee")
+            {
+                TakeDamage(20);
+            }
+
+            if (EnterredObject.tag == "BossKnife")
+            {
+                TakeDamage(20);
+            }
+
             if (EnterredObject.gameObject.name == ("SpikeTrigger"))
             {
                 TakeDamage(100);
