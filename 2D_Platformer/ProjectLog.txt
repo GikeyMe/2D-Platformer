@@ -219,3 +219,21 @@ as this rewards skillful play.
 There is currently a bug where when the boss changes phases his animation doesn't make the switch from melee to run fast enough.
 
 I Still need to write the code for when the boss reaches 0 hp, the door opens and he runs away.
+
+
+11th February 2016
+-------------------
+Fixed yesterdays animation bug for when the boss changes phases. I added a new animation transition between Boss Melee and Boss Run states that occurs
+whenever speed > 0.01. This actually caused a new bug which made the boss unable to finish his melee attack animation while trying to attack the player.
+The cause of this was in the MeleeAttackState code as it sets the speed to 1 in the MoveToPlayer procedure but never sets it back to 0 again. So I added
+code in the Attack procedure to set speed back to 0 if the agent is a worm or a boss. This fixed the new bug. I also needed to add a transition from Boss Hurt
+to Boss run that occurs when speed is greater than 0.01 so that at the start of the phase change the boss isn't playing the "Boss Hurt" aniamtion at the start
+of the phase change. All animations now appear to be working correctly.
+
+Found a bug where player can land on spikes and not die if he takes damage just prior to it, the immunity saves him. Fixed by changing code so spikes ignore
+immunity.
+
+Added script to make boss exit the level when his hp reaches 0. Also created new script to open the exit door when the boss is on 0 hp. Finished adding
+decorations to first level.
+
+Found a bug where boss could be forced to despawn if pushed into the collider. Added a check in the code to ensure he is on 0 hp before despawning.

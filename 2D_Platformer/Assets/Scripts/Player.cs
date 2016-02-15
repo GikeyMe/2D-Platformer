@@ -313,8 +313,13 @@ public class Player : MonoBehaviour {
         }
     }
 
-    public void TakeDamage(int hp)
+    public void TakeDamage(string source, int hp)
     {
+        if (source.Equals("SpikeTrigger"))              //added this code to ignore immunity when landing on spikes
+        {
+            hitpoints = 0;
+            PlayerAnimator.SetTrigger("Death");
+        }
         if (!Immunity)
         {
             hitpoints -= hp;
@@ -348,32 +353,32 @@ public class Player : MonoBehaviour {
         {
             if (EnterredObject.tag == "SlimeMelee")
             {
-                TakeDamage(20);
+                TakeDamage("SlimeMelee",20);
             }
 
             if (EnterredObject.tag == "BatMelee")
             {
-                TakeDamage(20);
+                TakeDamage("BatMelee",20);
             }
 
             if (EnterredObject.tag == "WormMelee")
             {
-                TakeDamage(20);
+                TakeDamage("WormMelee",20);
             }
 
             if(EnterredObject.tag == "BossMelee")
             {
-                TakeDamage(20);
+                TakeDamage("BossMelee",20);
             }
 
             if (EnterredObject.tag == "BossKnife")
             {
-                TakeDamage(20);
+                TakeDamage("BossKnife",20);
             }
 
             if (EnterredObject.gameObject.name == ("SpikeTrigger"))
             {
-                TakeDamage(100);
+                TakeDamage("SpikeTrigger",100);
             }
 
             if(EnterredObject.tag == "Diamond")

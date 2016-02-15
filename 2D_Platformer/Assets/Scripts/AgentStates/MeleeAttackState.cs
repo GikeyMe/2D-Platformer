@@ -65,6 +65,7 @@ public class MeleeAttackState : IAgentState
         if (currentAgent is Slime || currentAgent is Worm || currentAgent is Boss)
         {
             //speed is a parameter needed for unity to know when to transition from idle to run animation and vice versa
+            Debug.Log("Moving to player.");
             AgentAnimator.SetFloat("speed", 1);
         }
     } 
@@ -76,6 +77,7 @@ public class MeleeAttackState : IAgentState
             //trigger worm melee animation.
             if (currentAgent is Worm || currentAgent is Boss)
             {
+                AgentAnimator.SetFloat("speed", 0);
                 AgentAnimator.SetTrigger("Melee");
                 return;
             }

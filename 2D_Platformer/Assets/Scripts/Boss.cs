@@ -7,6 +7,9 @@ public class Boss : Agent {
     private GameObject knifePrefab;
 
     [SerializeField]
+    private BossExitDoor exitDoor;
+
+    [SerializeField]
     private Transform KnifePosition;
 
     [SerializeField]
@@ -49,6 +52,13 @@ public class Boss : Agent {
         else if (hitpoints < 100 && !FourthPhaseReached)
         {
             FourthPhase = true;
+        }
+        else if (hitpoints <= 0)
+        {
+            if (!(activeState is PhaseChangeState))
+                SetState(new PhaseChangeState());
+            activeState.Act();
+            exitDoor.OpenDoor();
         }
 
         if (Alive())
@@ -113,6 +123,9 @@ public class Boss : Agent {
             FourthPhase = false;
             AgentAnimator.SetFloat("speed", 0);
         }
+
+        if (EnterredObject.tag == "BossDespawn" && hitpoints <= 0)
+            Destroy(gameObject);
         base.OnTriggerEnter2D(EnterredObject);
     }
 
