@@ -20,10 +20,14 @@ public class RangedAttackState : IAgentState {
 
     public void Act()
     {
-        if (currentAgent is Boss)
-        {
+        AgentAnimator.SetFloat("speed", 0);
+        if (player.transform.position.x < AgentRigidbody.transform.position.x)
             currentAgent.Flip(-1);
+        if (player.transform.position.x > AgentRigidbody.transform.position.x)
+            currentAgent.Flip(1);
+        if (currentAgent is Boss)
             AgentAnimator.SetBool("Throwing", true);
-        }
+        if (currentAgent is Crawler)
+            AgentAnimator.SetBool("Shooting", true);
     }
 }

@@ -237,3 +237,80 @@ Added script to make boss exit the level when his hp reaches 0. Also created new
 decorations to first level.
 
 Found a bug where boss could be forced to despawn if pushed into the collider. Added a check in the code to ensure he is on 0 hp before despawning.
+
+
+15th February 2016
+------------------
+Built the second level. This was a time consuming process as it involved lots of tile placement as before. However I was also able to reuse many assets that
+were created for level one. For example, ladders, the exit door, the jump powerup, spike obstacles and moving platforms. This helped save some time. For this
+level I intend to have an AI that uses ranged attacks, and AI that searches for and uses powerups and some third AI.
+
+
+17th February 2016
+------------------
+Added collision to level two. This involved adding box colliders to each of the land masses so that the player doesn't fall through the level. platforms did
+not need collision added to them as they handle that themselves due to the different nature of collision on platforms.
+
+Encountered a bug with ladders where if the player jumped off the ladder before reaching the top (ie before his climb speed was set to zero and he enterred
+the climb idle animation) he would be stuck playing the climb animation while running along the platform. This was fixed by adding code to player script to
+check whether or not the player is on a ladder, and if not set climb speed to zero to allow the animator to transition back to the necessary animations.
+
+Added a new AI to the game. This AI is called the "Crawler" AI. It needed run, damage, death and shoot animations to be created for it, aswell as all the 
+necessary transitions. It also needed a new script to be created, like the rest of the AI scripts, this inherits from Agent to reuse code for common
+functionality. This agent makes use of the following states : Idle, Patrol, Hide, RangedAttack. The RangedAttack state was only recently created to be used
+for the first boss fight but it works very well for the crawler aswell. I modified the code slightly for ranged attack state as when it was first written it
+actually was only capable of attacking to the left which worked for the boss fight but really shouldn't have been written that way so the code has been
+rectified so that the agent (Boss or crawler) can now use ranged attacks in either direction.
+
+I wrote the logic for the crawler in such a way that if it enters the hide state, it will remain in that state unless it is able to use ranged attacks on the
+player. i.e it will not transition from the hide state back to patrol state for at least 20 seconds.
+
+animation for shooting was making the agent jump so I corrected the pivot point of the death animation (because I use 2 clips from that to shoot) and this
+fixed the issue.
+
+
+23rd February 2016
+------------------
+Created a new powerup. This powerup increases the melee attack power of the player when it is activated. I used the same sprite as the one used for the jump
+powerup but I put a blue filter over it. When the players collision box hits the powerup's collision box, a "MeleePowerUp" boolean is set to true for the 
+player. While this boolean is set to true, the player will turn blue whenever he uses a melee attack (this is to show the player that the powerup is active).
+
+Due to the fact that it is the agent class that dictates how much damage enemies receive, it was necessary to add new code to check the color of the player
+sprite before calculating how much damage to take (because if the sprite is blue the player has the powerup so more damage should be taken.)
+
+I also created a new AI today called a "Seeker". What makes this AI unique is that when it sees that the player is in range, it attempts to seek out a
+melee attack powerup to activate on itself before attacking the player. This required me to add a new agent state (SeekPowerState) to handle the search for
+the powerup.
+
+I also needed to add alot of unique code to the Seeker class so that it can actually handle the powerup, as it is the first agent capable of activating them.
+The code was similar to the code I wrote for the player where the time remaining on the powerup is constantly checked and at a certain point the sprite will
+flicker and then go back to normal.
+
+I still need to modify the code for the HideState for the seeker so that it won't accidentally pick up the powerup when hiding, and I still need to add the
+damage functionality for when the seeker hits the player. 
+
+
+24th February 2016
+-------------------
+Modified code of hide state to prevent the seeker from accidentally picking up the powerup. 
+
+Found a bug where if player jumps onto platform and quickly jumps back off, seeker gets stuck in seekpowerup state.
+
+Bug was caused by me not allowing access into patrol state if the agent is already in the seekpower state. The original thinking behind this was that I didn't
+want the agent to be constantly switching between the two states as it might hamper its ability to get to the powerup. However after removing this code, it
+seems that the agent is still able to collect the powerup in the same manner as before, and it also fixes the bug where the agent is stuck in the seekpower
+state.
+
+Added the functionality for damaging the player. This was done by creating two melee hit boxes for the agent rather than just one. The second one would be
+used while the powerup is active. So I overrided the two methods in agent (EnableHitBox and DisableHitBox) so that they enable and disable the correct 
+hitboxes depending on whether or not the agent has the powerup active.
+
+It was then just a case of adding code to the playerscript to take the correct amount of damage depending on which hitbox collides with the player.
+
+25th February 2016
+------------------
+Did second boss.
+
+
+29th February 2016
+------------------

@@ -22,7 +22,7 @@ public class MeleeAttackState : IAgentState
     public void Act()
     {
         currentAgent.MeleeHitBox.enabled = false;
-            if (RecentlyAttacked && (!(currentAgent is Worm) && !(currentAgent is Boss)))
+            if (RecentlyAttacked && (!(currentAgent is Worm) && !(currentAgent is Boss) && !(currentAgent is BossTwo) && !(currentAgent is Seeker)))
             {
                 MoveFromPlayer();
             }
@@ -50,35 +50,51 @@ public class MeleeAttackState : IAgentState
 
     private void MoveToPlayer()
     {
-        //checking patrol bounds doesn't make sense for bat and boss however they seem to be working even with this code in place.
-        if ((player.transform.position.x > AgentRigidbody.transform.position.x) && AgentRigidbody.transform.position.x < currentAgent.getxPatrolStop())
+        //checking patrol bounds doesn't make sense for bat and boss
+        if ((currentAgent is Boss || currentAgent is BossTwo) && player.transform.position.x > AgentRigidbody.transform.position.x)
         {
             AgentRigidbody.velocity = new Vector2(1 * currentAgent.getrunSpeed(), AgentRigidbody.velocity.y);
             currentAgent.Flip(1);
         }
-        if ((player.transform.position.x < AgentRigidbody.transform.position.x) && AgentRigidbody.transform.position.x > currentAgent.getxPatrolStart())
+
+        else if ((currentAgent is Boss || currentAgent is BossTwo) && player.transform.position.x < AgentRigidbody.transform.position.x)
         {
             AgentRigidbody.velocity = new Vector2(-1 * currentAgent.getrunSpeed(), AgentRigidbody.velocity.y);
             currentAgent.Flip(-1);
         }
 
-        if (currentAgent is Slime || currentAgent is Worm || currentAgent is Boss)
+
+
+
+        else if ((player.transform.position.x > AgentRigidbody.transform.position.x) && AgentRigidbody.transform.position.x < currentAgent.getxPatrolStop())
         {
-            //speed is a parameter needed for unity to know when to transition from idle to run animation and vice versa
-            Debug.Log("Moving to player.");
+            AgentRigidbody.velocity = new Vector2(1 * currentAgent.getrunSpeed(), AgentRigidbody.velocity.y);
+            currentAgent.Flip(1);
+        }
+        else if ((player.transform.position.x < AgentRigidbody.transform.position.x) && AgentRigidbody.transform.position.x > currentAgent.getxPatrolStart())
+        {
+            AgentRigidbody.velocity = new Vector2(-1 * currentAgent.getrunSpeed(), AgentRigidbody.velocity.y);
+            currentAgent.Flip(-1);
+        }
+
+        if (!(currentAgent is Bat))
+        {
+            //speed is a parameter needed for unity to know when to transition from idle to run animation and vice versa            
             AgentAnimator.SetFloat("speed", 1);
         }
     } 
 
     private void Attack()
     {
-        if ((Mathf.Abs(player.transform.position.x - AgentRigidbody.transform.position.x) < 1.5) || (currentAgent is Boss && Mathf.Abs(player.transform.position.x - AgentRigidbody.transform.position.x) < 3.0))
+        if ((Mathf.Abs(player.transform.position.x - AgentRigidbody.transform.position.x) < 1.5) || ((currentAgent is Boss || currentAgent is BossTwo) && Mathf.Abs(player.transform.position.x - AgentRigidbody.transform.position.x) < 4.0) 
+            || (currentAgent is Seeker && Mathf.Abs(player.transform.position.x - AgentRigidbody.transform.position.x) < 5.5))
         {
             //trigger worm melee animation.
-            if (currentAgent is Worm || currentAgent is Boss)
+            if (currentAgent is Worm || currentAgent is Boss || currentAgent is BossTwo || currentAgent is Seeker)
             {
                 AgentAnimator.SetFloat("speed", 0);
                 AgentAnimator.SetTrigger("Melee");
+                Debug.Log("Triggered Melee.");
                 return;
             }
             currentAgent.MeleeHitBox.enabled = true;

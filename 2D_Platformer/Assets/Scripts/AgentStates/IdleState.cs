@@ -18,7 +18,7 @@ public class IdleState : IAgentState
 
     public void Act()
     {
-        if (currentAgent is Slime  || currentAgent is Worm || currentAgent is Boss)
+        if (!(currentAgent is Bat))
         {
             if (AgentRigidbody.velocity.x == 0)
                 AgentAnimator.SetFloat("speed", 0);

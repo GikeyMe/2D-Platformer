@@ -45,7 +45,6 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\Scripts\Agent.cs" />
      <Compile Include="Assets\Scripts\AgentStates\ChaseState.cs" />
      <Compile Include="Assets\Scripts\AgentStates\HideState.cs" />
      <Compile Include="Assets\Scripts\AgentStates\IAgentState.cs" />
@@ -54,32 +53,32 @@
      <Compile Include="Assets\Scripts\AgentStates\PatrolState.cs" />
      <Compile Include="Assets\Scripts\AgentStates\PhaseChangeState.cs" />
      <Compile Include="Assets\Scripts\AgentStates\RangedAttackState.cs" />
-     <Compile Include="Assets\Scripts\Bat.cs" />
-     <Compile Include="Assets\Scripts\Boss.cs" />
-     <Compile Include="Assets\Scripts\BossExitDoor.cs" />
+     <Compile Include="Assets\Scripts\AgentStates\SeekPowerState.cs" />
+     <Compile Include="Assets\Scripts\Agents\Agent.cs" />
+     <Compile Include="Assets\Scripts\Agents\Bat.cs" />
+     <Compile Include="Assets\Scripts\Agents\Boss.cs" />
+     <Compile Include="Assets\Scripts\Agents\BossTwo.cs" />
+     <Compile Include="Assets\Scripts\Agents\Crawler.cs" />
+     <Compile Include="Assets\Scripts\Agents\Seeker.cs" />
+     <Compile Include="Assets\Scripts\Agents\Slime.cs" />
+     <Compile Include="Assets\Scripts\Agents\Worm.cs" />
      <Compile Include="Assets\Scripts\BossKnife.cs" />
      <Compile Include="Assets\Scripts\Bullet.cs" />
      <Compile Include="Assets\Scripts\Camera.cs" />
-     <Compile Include="Assets\Scripts\CollisionTrigger.cs" />
-     <Compile Include="Assets\Scripts\ExitDoor.cs" />
-     <Compile Include="Assets\Scripts\LevelTransition.cs" />
-     <Compile Include="Assets\Scripts\Lever.cs" />
-     <Compile Include="Assets\Scripts\MovingPlatform.cs" />
+     <Compile Include="Assets\Scripts\GameObstacles\BossExitDoor.cs" />
+     <Compile Include="Assets\Scripts\GameObstacles\CollisionTrigger.cs" />
+     <Compile Include="Assets\Scripts\GameObstacles\ExitDoor.cs" />
+     <Compile Include="Assets\Scripts\GameObstacles\LevelTransition.cs" />
+     <Compile Include="Assets\Scripts\GameObstacles\Lever.cs" />
+     <Compile Include="Assets\Scripts\GameObstacles\MovingPlatform.cs" />
      <Compile Include="Assets\Scripts\Player.cs" />
-     <Compile Include="Assets\Scripts\Slime.cs" />
-     <Compile Include="Assets\Scripts\Worm.cs" />
+     <Compile Include="Assets\Scripts\PowerUpController.cs" />
      <Compile Include="Assets\asd.cs" />
- <Reference Include="UnityEngine.Advertisements">
- <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/Advertisements/UnityEngine.Advertisements.dll</HintPath>
- </Reference>
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.Networking">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/Networking/UnityEngine.Networking.dll</HintPath>
- </Reference>
- <Reference Include="UnityEngine.Analytics">
- <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/UnityAnalytics/UnityEngine.Analytics.dll</HintPath>
  </Reference>
  <Reference Include="Mono.Cecil">
  <HintPath>C:/Program Files/Unity/Editor/Data/Managed/Mono.Cecil.dll</HintPath>

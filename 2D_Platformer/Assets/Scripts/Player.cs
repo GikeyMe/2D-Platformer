@@ -50,6 +50,7 @@ public class Player : MonoBehaviour {
     private float FlickerTime;
 
     private bool JumpPowerUp;
+    private bool MeleePowerUp;
     private float PowerUpTime;
 
     private Color originalColor;
@@ -105,12 +106,19 @@ public class Player : MonoBehaviour {
         HandleInput();                   //check for player input and deal with it as necessary
     }
 
+    public bool isMeleePowerUp()
+    {
+        return MeleePowerUp;
+    }
+
     private void HandleInput()
     {
         if (Input.GetKeyDown(KeyCode.LeftShift) && !this.PlayerAnimator.GetCurrentAnimatorStateInfo(0).IsTag("Melee")) //if player presses melee key and we aren't already playing melee animation
         {
             PlayerAnimator.SetTrigger("melee");  //trigger the melee parameter in unity to start animation transition
             PlayerRigidbody.velocity = Vector2.zero; //stop movement on all axes while animation plays
+            if (MeleePowerUp)
+                PlayerSpriteRenderer.color = Color.blue;
         }
 
         if (Input.GetKeyDown(KeyCode.Space) && (onGround || JumpPowerUp))  //if the player presses space and we aren't already jumping or falling
@@ -174,6 +182,8 @@ public class Player : MonoBehaviour {
             PlayerRigidbody.velocity = new Vector2(PlayerRigidbody.velocity.x, Input.GetAxisRaw("Vertical") * runSpeed);
             PlayerAnimator.SetFloat("ClimbSpeed", Mathf.Abs(Input.GetAxisRaw("Vertical")) * runSpeed);
         }
+        if (!OnLadder)
+            PlayerAnimator.SetFloat("ClimbSpeed", 0);
     }
 
 
@@ -282,16 +292,40 @@ public class Player : MonoBehaviour {
                 PowerUpTime = 0;
             }
         }
+
+        if (MeleePowerUp)
+        {
+            PowerUpTime += Time.deltaTime;
+            if (PowerUpTime < 0.3)              // use this to flash when player first picks up powerup
+                PowerUpFlicker();
+            if (PowerUpTime > 5)
+                PowerUpFlicker();               
+            if (PowerUpTime > 8)
+            {
+                MeleePowerUp = false;
+                PlayerSpriteRenderer.color = originalColor;
+                PowerUpTime = 0;
+            }
+        }
     }
 
     private void PowerUpFlicker()
-    {
+    {            
         if (FlickerTime < 0.1)
         {
             FlickerTime += Time.deltaTime;
         }
         else if (FlickerTime >= 0.1)
         {
+            if (MeleePowerUp)
+            {
+                if (PlayerSpriteRenderer.color == Color.blue)
+                    PlayerSpriteRenderer.color = originalColor;
+                else
+                    PlayerSpriteRenderer.color = Color.blue;
+                FlickerTime = 0;
+                return;
+            }
             if (PlayerSpriteRenderer.color == Color.red)
                 PlayerSpriteRenderer.color = originalColor;
             else
@@ -345,10 +379,16 @@ public class Player : MonoBehaviour {
     {
         MeleeHitbox.enabled = false;
         PlayerRigidbody.velocity = new Vector2(0, PlayerRigidbody.velocity.y);
+        PlayerSpriteRenderer.color = originalColor;
     }
 
     private void OnTriggerEnter2D(Collider2D EnterredObject)
     {
+        if (EnterredObject.tag == "BossPowerMelee" && Alive())          //have this outside normal condition as player meleeing should not block this damage.
+        {
+            TakeDamage("BossPowerMelee", 100);
+        }
+
         if (Alive() && !PlayerAnimator.GetCurrentAnimatorStateInfo(0).IsTag("Melee"))
         {
             if (EnterredObject.tag == "SlimeMelee")
@@ -376,6 +416,21 @@ public class Player : MonoBehaviour {
                 TakeDamage("BossKnife",20);
             }
 
+            if(EnterredObject.tag == "SeekerMelee")
+            {
+                TakeDamage("SeekerMelee", 20);
+            }
+
+            if (EnterredObject.tag == "SeekerPowerMelee")
+            {
+                TakeDamage("SeekerPowerMelee", 50);
+            }
+
+            if (EnterredObject.tag == "CrawlerBullet")
+            {
+                TakeDamage("CrawlerBullet", 20);
+            }
+
             if (EnterredObject.gameObject.name == ("SpikeTrigger"))
             {
                 TakeDamage("SpikeTrigger",100);
@@ -385,6 +440,11 @@ public class Player : MonoBehaviour {
             {
                 JumpPowerUp = true;
                 PlayerSpriteRenderer.color = Color.red;
+            }
+
+            if(EnterredObject.tag == "BlueDiamond")
+            {
+                MeleePowerUp = true;
             }
 
             if(EnterredObject.tag == "Ladder")

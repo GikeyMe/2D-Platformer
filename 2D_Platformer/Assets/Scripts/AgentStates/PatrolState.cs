@@ -18,6 +18,23 @@ public class PatrolState : IAgentState
 
     public void Act()
     {
+        if (currentAgent is Seeker)
+        {
+            if (currentAgent.isFacingRight() && AgentRigidbody.transform.position.x < currentAgent.getxPatrolStop() -5)
+                AgentRigidbody.velocity = new Vector2(1 * currentAgent.getpatrolSpeed(), AgentRigidbody.velocity.y);
+            if (!currentAgent.isFacingRight() && AgentRigidbody.transform.position.x > currentAgent.getxPatrolStart() + 5)
+                AgentRigidbody.velocity = new Vector2(-1 * currentAgent.getpatrolSpeed(), AgentRigidbody.velocity.y);
+            if (AgentRigidbody.transform.position.x >= currentAgent.getxPatrolStop() -5)
+            {
+                currentAgent.Flip(-1);
+            }
+            if (AgentRigidbody.transform.position.x <= currentAgent.getxPatrolStart() +5)
+            {
+                currentAgent.Flip(1);
+            }
+        }
+
+
         if (currentAgent.isFacingRight() && AgentRigidbody.transform.position.x < currentAgent.getxPatrolStop())
             AgentRigidbody.velocity = new Vector2(1 * currentAgent.getpatrolSpeed(), AgentRigidbody.velocity.y);
         if (!currentAgent.isFacingRight() && AgentRigidbody.transform.position.x > currentAgent.getxPatrolStart())
@@ -31,7 +48,7 @@ public class PatrolState : IAgentState
             currentAgent.Flip(1);
         }
 
-        if (currentAgent is Slime  || currentAgent is Worm || currentAgent is Boss)
+        if (!(currentAgent is Bat))
         {
             //speed is a parameter needed for unity to know when to transition from idle to run animation and vice versa
             AgentAnimator.SetFloat("speed", 1);

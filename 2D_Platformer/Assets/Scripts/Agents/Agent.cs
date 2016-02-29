@@ -7,7 +7,7 @@ public abstract class Agent : MonoBehaviour {
     protected Animator AgentAnimator;
     protected Rigidbody2D AgentRigidbody;
     [SerializeField]
-    private float runSpeed;
+    protected float runSpeed;
     [SerializeField]
     private float patrolSpeed;
     [SerializeField]
@@ -113,11 +113,14 @@ public abstract class Agent : MonoBehaviour {
         {
             if (EnterredObject.tag == "Bullet")
             {
-                TakeDamage(10);
+                TakeDamage(20);
             }
             if (EnterredObject.tag == "Melee")
             {
-                TakeDamage(20);
+                if (player.GetComponent<SpriteRenderer>().color == Color.blue)               //if sprite is blue player has melee powerup
+                    TakeDamage(50);
+                else
+                    TakeDamage(20);
             }
         }
     }
@@ -145,14 +148,14 @@ public abstract class Agent : MonoBehaviour {
         AgentRigidbody.gravityScale = 8;
     }
 
-    private void EnableHitBox()
+    protected virtual void EnableHitBox()
     {
         MeleeHitBox.enabled = true;
         AgentRigidbody.velocity = new Vector2((float)0.000001, AgentRigidbody.velocity.y);  //Need a tiny velocity to trigger the OnTriggerEnter event in Player.
         AgentRigidbody.velocity = new Vector2(0, AgentRigidbody.velocity.y);
     }
 
-    private void DisableHitBox()
+    protected virtual void DisableHitBox()
     {
         MeleeHitBox.enabled = false;
     }
@@ -164,7 +167,8 @@ public abstract class Agent : MonoBehaviour {
 
     protected bool IsPlayerReachable()
     {
-        if (((player.transform.position.x < xPatrolStart-1.5) || (player.transform.position.x > xPatrolStop+1.5)) && (!(canAgentFly())))
+        if (((player.transform.position.x < xPatrolStart-1.5) || (player.transform.position.x > xPatrolStop+1.5) 
+            || !(Mathf.Abs(player.transform.position.y - AgentRigidbody.transform.position.y) < 5)) && (!(canAgentFly())))
             return false;
         return true;
     }
