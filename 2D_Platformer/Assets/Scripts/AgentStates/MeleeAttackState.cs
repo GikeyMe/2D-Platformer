@@ -17,12 +17,14 @@ public class MeleeAttackState : IAgentState
         AgentAnimator = currentAgent.GetComponent<Animator>();
         player = GameObject.Find("Player");
         Debug.Log("Melee State");
+        if (currentAgent is Boss || currentAgent is BossThree)
+            AgentAnimator.SetBool("Throwing", false);
     }
 
     public void Act()
     {
         currentAgent.MeleeHitBox.enabled = false;
-            if (RecentlyAttacked && (!(currentAgent is Worm) && !(currentAgent is Boss) && !(currentAgent is BossTwo) && !(currentAgent is Seeker)))
+            if (RecentlyAttacked && (!(currentAgent is Worm) && !(currentAgent is Boss) && !(currentAgent is BossTwo) && !(currentAgent is BossThree) && !(currentAgent is Seeker)))
             {
                 MoveFromPlayer();
             }
@@ -51,13 +53,13 @@ public class MeleeAttackState : IAgentState
     private void MoveToPlayer()
     {
         //checking patrol bounds doesn't make sense for bat and boss
-        if ((currentAgent is Boss || currentAgent is BossTwo) && player.transform.position.x > AgentRigidbody.transform.position.x)
+        if ((currentAgent is Boss || currentAgent is BossTwo || currentAgent is BossThree) && player.transform.position.x > AgentRigidbody.transform.position.x)
         {
             AgentRigidbody.velocity = new Vector2(1 * currentAgent.getrunSpeed(), AgentRigidbody.velocity.y);
             currentAgent.Flip(1);
         }
 
-        else if ((currentAgent is Boss || currentAgent is BossTwo) && player.transform.position.x < AgentRigidbody.transform.position.x)
+        else if ((currentAgent is Boss || currentAgent is BossTwo || currentAgent is BossThree) && player.transform.position.x < AgentRigidbody.transform.position.x)
         {
             AgentRigidbody.velocity = new Vector2(-1 * currentAgent.getrunSpeed(), AgentRigidbody.velocity.y);
             currentAgent.Flip(-1);
@@ -86,11 +88,11 @@ public class MeleeAttackState : IAgentState
 
     private void Attack()
     {
-        if ((Mathf.Abs(player.transform.position.x - AgentRigidbody.transform.position.x) < 1.5) || ((currentAgent is Boss || currentAgent is BossTwo) && Mathf.Abs(player.transform.position.x - AgentRigidbody.transform.position.x) < 4.0) 
+        if ((Mathf.Abs(player.transform.position.x - AgentRigidbody.transform.position.x) < 1.5) || ((currentAgent is Boss || currentAgent is BossTwo || currentAgent is BossThree) && Mathf.Abs(player.transform.position.x - AgentRigidbody.transform.position.x) < 4.0) 
             || (currentAgent is Seeker && Mathf.Abs(player.transform.position.x - AgentRigidbody.transform.position.x) < 5.5))
         {
-            //trigger worm melee animation.
-            if (currentAgent is Worm || currentAgent is Boss || currentAgent is BossTwo || currentAgent is Seeker)
+            //trigger melee animation.
+            if (currentAgent is Worm || currentAgent is Boss || currentAgent is BossTwo ||currentAgent is BossThree || currentAgent is Seeker)
             {
                 AgentAnimator.SetFloat("speed", 0);
                 AgentAnimator.SetTrigger("Melee");

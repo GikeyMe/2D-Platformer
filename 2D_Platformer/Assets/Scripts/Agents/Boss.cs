@@ -20,6 +20,8 @@ public class Boss : Agent {
     private LayerMask whatIsGround;
     [SerializeField]
     private float jumpSpeed;
+    [SerializeField]
+    private HealthBar myHealthBar;
 
     private bool onGround;
     private bool PlayerNearby;
@@ -36,10 +38,11 @@ public class Boss : Agent {
       //  onGround = CheckGrounded();
         base.Start();
         FirstPhase = true;
-	}
+    }
 
     void Update()
     {
+        myHealthBar.UpdateHealth(hitpoints, 400f);
         if (hitpoints < 300 && !SecondPhaseReached)
         {
             FirstPhase = false;

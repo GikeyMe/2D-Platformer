@@ -25,7 +25,7 @@ public class RangedAttackState : IAgentState {
             currentAgent.Flip(-1);
         if (player.transform.position.x > AgentRigidbody.transform.position.x)
             currentAgent.Flip(1);
-        if (currentAgent is Boss)
+        if (currentAgent is Boss || currentAgent is BossThree)
             AgentAnimator.SetBool("Throwing", true);
         if (currentAgent is Crawler)
             AgentAnimator.SetBool("Shooting", true);

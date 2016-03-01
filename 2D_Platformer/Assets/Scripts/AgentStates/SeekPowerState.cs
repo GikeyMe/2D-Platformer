@@ -19,11 +19,13 @@ public class SeekPowerState : IAgentState {
         player = GameObject.Find("Player");
         powerups = GameObject.FindGameObjectsWithTag("BlueDiamond");
         Debug.Log("Seek Power State");
+        if (currentAgent is Boss || currentAgent is BossThree)
+            AgentAnimator.SetBool("Throwing", false);
     }
 
     public void Act()
     {
-        if (currentAgent is BossTwo)
+        if (currentAgent is BossTwo || currentAgent is BossThree)
         {
             goToPowerUp((GameObject)powerups.GetValue(0));
             return;

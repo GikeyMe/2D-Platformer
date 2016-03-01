@@ -45,6 +45,9 @@ public class Player : MonoBehaviour {
     [SerializeField]
     private BoxCollider2D Usebox;
 
+    [SerializeField]
+    private HealthBar myHealthBar;
+
     private bool Immunity;
     private float ImmunityTime;
     private float FlickerTime;
@@ -56,6 +59,9 @@ public class Player : MonoBehaviour {
     private Color originalColor;
 
     private bool OnLadder;
+    private float RegenWaitTime;
+    private float RegenTime;
+    private float NextRegenTick;
 
 
 
@@ -94,6 +100,8 @@ public class Player : MonoBehaviour {
         OnMovingPlat = IsPlayerOnMovingPlatform();
         float horizontal = Input.GetAxis("Horizontal"); //Unity already has keybinds set up for right and left movement. GetAxis returns a float representing the direction the player is inputting.
         UpdateImmunity();
+        myHealthBar.UpdateHealth(hitpoints,100f);
+        UpdateHealthRegen();
         UpdatePowerUp();
         PlayerMovement(horizontal);  // handle player movement
         Flip(horizontal);            // do we need to flip the sprite?
@@ -113,7 +121,7 @@ public class Player : MonoBehaviour {
 
     private void HandleInput()
     {
-        if (Input.GetKeyDown(KeyCode.LeftShift) && !this.PlayerAnimator.GetCurrentAnimatorStateInfo(0).IsTag("Melee")) //if player presses melee key and we aren't already playing melee animation
+        if (Input.GetKeyDown(KeyCode.Mouse0) && !this.PlayerAnimator.GetCurrentAnimatorStateInfo(0).IsTag("Melee")) //if player presses melee key and we aren't already playing melee animation
         {
             PlayerAnimator.SetTrigger("melee");  //trigger the melee parameter in unity to start animation transition
             PlayerRigidbody.velocity = Vector2.zero; //stop movement on all axes while animation plays
@@ -128,12 +136,12 @@ public class Player : MonoBehaviour {
                 PlayerAnimator.SetTrigger("Jump");                         // Trigger the jump animation
         }
 
-        if (Input.GetKeyDown(KeyCode.LeftControl))
+        if (Input.GetKeyDown(KeyCode.Mouse1))
         {
             PlayerAnimator.SetBool("Shooting", true);
         }
 
-        if (Input.GetKeyUp(KeyCode.LeftControl))
+        if (Input.GetKeyUp(KeyCode.Mouse1))
         {
             PlayerAnimator.SetBool("Shooting", false);
         }
@@ -263,13 +271,44 @@ public class Player : MonoBehaviour {
         }
     }
 
+    private void UpdateHealthRegen()
+    {
+        if (hitpoints == 0)
+            return;
+        RegenWaitTime += Time.deltaTime;
+        if (RegenWaitTime > 4)
+        {
+            RegenerateHealth();
+        }
+        else
+        {
+            RegenTime = 0;
+            NextRegenTick = 0;
+        }
+            
+    }
+
+    private void RegenerateHealth()
+    {
+        RegenTime += Time.deltaTime;
+        if (RegenTime > NextRegenTick)
+        {
+            if ((hitpoints + 20) > 100)
+                hitpoints = 100;
+            else
+                hitpoints += 20;
+
+            NextRegenTick = RegenTime + 1;             // next tick of regen is 1 second from now
+        }
+    }
+
     private void UpdateImmunity()
     {
         if (Immunity)
         {
             SpriteFlicker();
             ImmunityTime += Time.deltaTime;
-            if (ImmunityTime > 1)
+            if (ImmunityTime > 2)
             {
                 Immunity = false;
                 PlayerSpriteRenderer.enabled = true;
@@ -349,6 +388,7 @@ public class Player : MonoBehaviour {
 
     public void TakeDamage(string source, int hp)
     {
+        RegenWaitTime = 0;                              //Player took damage so reset health regen timer
         if (source.Equals("SpikeTrigger"))              //added this code to ignore immunity when landing on spikes
         {
             hitpoints = 0;
@@ -384,13 +424,13 @@ public class Player : MonoBehaviour {
 
     private void OnTriggerEnter2D(Collider2D EnterredObject)
     {
-        if (EnterredObject.tag == "BossPowerMelee" && Alive())          //have this outside normal condition as player meleeing should not block this damage.
+        if (Alive())
         {
-            TakeDamage("BossPowerMelee", 100);
-        }
+            if (EnterredObject.tag == "BossPowerMelee")        
+            {
+                TakeDamage("BossPowerMelee", 100);
+            }
 
-        if (Alive() && !PlayerAnimator.GetCurrentAnimatorStateInfo(0).IsTag("Melee"))
-        {
             if (EnterredObject.tag == "SlimeMelee")
             {
                 TakeDamage("SlimeMelee",20);

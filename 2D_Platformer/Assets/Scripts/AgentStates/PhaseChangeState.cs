@@ -14,6 +14,8 @@ public class PhaseChangeState : IAgentState {
         currentAgent = agent;
         AgentRigidbody = currentAgent.GetComponent<Rigidbody2D>();
         AgentAnimator = currentAgent.GetComponent<Animator>();
+        if (currentAgent is Boss || currentAgent is BossThree)
+            AgentAnimator.SetBool("Throwing", false);
     }
 
     public void Act()

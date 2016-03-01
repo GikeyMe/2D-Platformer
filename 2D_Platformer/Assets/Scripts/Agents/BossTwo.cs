@@ -23,6 +23,8 @@ public class BossTwo : Agent
     private float jumpSpeed;
     [SerializeField]
     private BoxCollider2D PowerMeleeHitBox;
+    [SerializeField]
+    private HealthBar myHealthBar;
 
     private bool onGround;
     private bool PlayerNearby;
@@ -60,6 +62,7 @@ public class BossTwo : Agent
         //prioritise getting powerup but ignore if player is closer to it
         //otherwise melee attack player.
 
+        myHealthBar.UpdateHealth(hitpoints, 800f);
         if (Alive())
         {
             UpdatePowerUp();
