@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
 
 public class Player : MonoBehaviour {
 
@@ -62,11 +63,18 @@ public class Player : MonoBehaviour {
     private float RegenWaitTime;
     private float RegenTime;
     private float NextRegenTick;
+    private Vector3 LastCheckpoint;
+    private float RespawnTime;
+    private int RemainingLives;
+    [SerializeField]
+    private Text LivesText;  
 
 
 
     // Use this for initialization
     void Start () {
+        RemainingLives = 3;
+        LastCheckpoint = this.transform.position;
         Immunity = false;
         int index = 1;
         facingRight = true;                              //we know the player character starts off facing right so set this to true
@@ -96,6 +104,8 @@ public class Player : MonoBehaviour {
     }
 	
 	void FixedUpdate () {
+        if (hitpoints <= 0)
+            PlayerRespawn();
         onGround = CheckGrounded();                     //better to use a variable here so we don't need to keep calling CheckGrounded() throughout FixedUpdate, don't want to slow the game down.
         OnMovingPlat = IsPlayerOnMovingPlatform();
         float horizontal = Input.GetAxis("Horizontal"); //Unity already has keybinds set up for right and left movement. GetAxis returns a float representing the direction the player is inputting.
@@ -121,38 +131,41 @@ public class Player : MonoBehaviour {
 
     private void HandleInput()
     {
-        if (Input.GetKeyDown(KeyCode.Mouse0) && !this.PlayerAnimator.GetCurrentAnimatorStateInfo(0).IsTag("Melee")) //if player presses melee key and we aren't already playing melee animation
+        if (hitpoints > 0)
         {
-            PlayerAnimator.SetTrigger("melee");  //trigger the melee parameter in unity to start animation transition
-            PlayerRigidbody.velocity = Vector2.zero; //stop movement on all axes while animation plays
-            if (MeleePowerUp)
-                PlayerSpriteRenderer.color = Color.blue;
-        }
+            if (Input.GetKeyDown(KeyCode.Mouse0) && !this.PlayerAnimator.GetCurrentAnimatorStateInfo(0).IsTag("Melee")) //if player presses melee key and we aren't already playing melee animation
+            {
+                PlayerAnimator.SetTrigger("melee");  //trigger the melee parameter in unity to start animation transition
+                PlayerRigidbody.velocity = Vector2.zero; //stop movement on all axes while animation plays
+                if (MeleePowerUp)
+                    PlayerSpriteRenderer.color = Color.blue;
+            }
 
-        if (Input.GetKeyDown(KeyCode.Space) && (onGround || JumpPowerUp))  //if the player presses space and we aren't already jumping or falling
-        {
+            if (Input.GetKeyDown(KeyCode.Space) && (onGround || JumpPowerUp))  //if the player presses space and we aren't already jumping or falling
+            {
                 onGround = false;
                 PlayerRigidbody.AddForce(new Vector2(0, jumpSpeed));    // make the player character jump (i.e apply a positive force on the y axis)
                 PlayerAnimator.SetTrigger("Jump");                         // Trigger the jump animation
-        }
+            }
 
-        if (Input.GetKeyDown(KeyCode.Mouse1))
-        {
-            PlayerAnimator.SetBool("Shooting", true);
-        }
+            if (Input.GetKeyDown(KeyCode.Mouse1))
+            {
+                PlayerAnimator.SetBool("Shooting", true);
+            }
 
-        if (Input.GetKeyUp(KeyCode.Mouse1))
-        {
-            PlayerAnimator.SetBool("Shooting", false);
-        }
-        
-        if(Input.GetKeyDown(KeyCode.E))
-        {
-            Usebox.enabled = true;
-        }
-        if (Input.GetKeyUp(KeyCode.E))
-        {
-            Usebox.enabled = false;
+            if (Input.GetKeyUp(KeyCode.Mouse1))
+            {
+                PlayerAnimator.SetBool("Shooting", false);
+            }
+
+            if (Input.GetKeyDown(KeyCode.E))
+            {
+                Usebox.enabled = true;
+            }
+            if (Input.GetKeyUp(KeyCode.E))
+            {
+                Usebox.enabled = false;
+            }
         }
     }
 
@@ -173,52 +186,58 @@ public class Player : MonoBehaviour {
 
     private void PlayerMovement(float horizontal)
     {
-        if(PlayerRigidbody.velocity.y < 0  && !(OnMovingPlat))  //if player character is falling and not on a moving platform
+        if (hitpoints > 0)
         {
-            PlayerAnimator.SetBool("Falling", true); //play falling animation. This can't be a trigger because we are unsure how far the player character is falling and so the animation has to be played 
-        }                                            // until explicitly told to stop. (i.e boolean is false again)
+            if (PlayerRigidbody.velocity.y < 0 && !(OnMovingPlat))  //if player character is falling and not on a moving platform
+            {
+                PlayerAnimator.SetBool("Falling", true); //play falling animation. This can't be a trigger because we are unsure how far the player character is falling and so the animation has to be played 
+            }                                            // until explicitly told to stop. (i.e boolean is false again)
 
-        if (!this.PlayerAnimator.GetCurrentAnimatorStateInfo(0).IsTag("Melee") && (onGround || airMovement)) //if we aren't already playing melee animation and we aren't jumping or falling,
-        {                                                                                                   // then we are allowed to move horizontally
-            PlayerRigidbody.velocity = new Vector2(horizontal * runSpeed, PlayerRigidbody.velocity.y);
-            //speed is a parameter needed for unity to know when to transition from idle to run animation and vice versa
-            PlayerAnimator.SetFloat("speed", Mathf.Abs(horizontal));  // we don't want a negative value so use Mathf.Abs
-        }  
+            if (!this.PlayerAnimator.GetCurrentAnimatorStateInfo(0).IsTag("Melee") && (onGround || airMovement)) //if we aren't already playing melee animation and we aren't jumping or falling,
+            {                                                                                                   // then we are allowed to move horizontally
+                PlayerRigidbody.velocity = new Vector2(horizontal * runSpeed, PlayerRigidbody.velocity.y);
+                //speed is a parameter needed for unity to know when to transition from idle to run animation and vice versa
+                PlayerAnimator.SetFloat("speed", Mathf.Abs(horizontal));  // we don't want a negative value so use Mathf.Abs
+            }
 
-        if(OnLadder)
-        {
-            PlayerRigidbody.velocity = new Vector2(PlayerRigidbody.velocity.x, Input.GetAxisRaw("Vertical") * runSpeed);
-            PlayerAnimator.SetFloat("ClimbSpeed", Mathf.Abs(Input.GetAxisRaw("Vertical")) * runSpeed);
+            if (OnLadder)
+            {
+                PlayerRigidbody.velocity = new Vector2(PlayerRigidbody.velocity.x, Input.GetAxisRaw("Vertical") * runSpeed);
+                PlayerAnimator.SetFloat("ClimbSpeed", Mathf.Abs(Input.GetAxisRaw("Vertical")) * runSpeed);
+            }
+            if (!OnLadder)
+                PlayerAnimator.SetFloat("ClimbSpeed", 0);
         }
-        if (!OnLadder)
-            PlayerAnimator.SetFloat("ClimbSpeed", 0);
     }
 
 
     private void Flip(float horizontal)
     {
-        if ((horizontal > 0 && !facingRight) || (horizontal < 0 && facingRight))
+        if (hitpoints > 0)
         {
-            
-            //negate the x axis scale for the player (i.e. flip the sprite)
-            Vector3 theScale = transform.localScale; 
-            theScale.x *= -1;
-            transform.localScale = theScale;
-
-            // due to the sprite being very wide, we also have to make a correction for the position on the x axis after the flip
-            Vector3 currentPos = transform.localPosition;
-            if (facingRight)
+            if ((horizontal > 0 && !facingRight) || (horizontal < 0 && facingRight))
             {
-                currentPos.Set(currentPos.x - (float)2.5, currentPos.y, currentPos.z);
+
+                //negate the x axis scale for the player (i.e. flip the sprite)
+                Vector3 theScale = transform.localScale;
+                theScale.x *= -1;
+                transform.localScale = theScale;
+
+                // due to the sprite being very wide, we also have to make a correction for the position on the x axis after the flip
+                Vector3 currentPos = transform.localPosition;
+                if (facingRight)
+                {
+                    currentPos.Set(currentPos.x - (float)2.5, currentPos.y, currentPos.z);
+                }
+                else
+                {
+                    currentPos.Set(currentPos.x + (float)2.5, currentPos.y, currentPos.z);
+                }
+                transform.localPosition = currentPos;
+
+                //need to change this each time we flip the player otherwise we will lose track of the direction he is facing
+                facingRight = !facingRight;
             }
-            else
-            {
-                currentPos.Set(currentPos.x + (float)2.5, currentPos.y, currentPos.z);
-            }         
-            transform.localPosition = currentPos;
-
-            //need to change this each time we flip the player otherwise we will lose track of the direction he is facing
-            facingRight = !facingRight; 
         }
     }
 
@@ -426,6 +445,10 @@ public class Player : MonoBehaviour {
     {
         if (Alive())
         {
+            if(EnterredObject.tag == "Checkpoint")
+            {
+                UpdateLastCheckpoint(EnterredObject);
+            }
             if (EnterredObject.tag == "BossPowerMelee")        
             {
                 TakeDamage("BossPowerMelee", 100);
@@ -510,5 +533,28 @@ public class Player : MonoBehaviour {
     private bool Alive()
     {
         return hitpoints > 0;     
+    }
+
+    private void PlayerRespawn()
+    {
+        //probably want to wait a few seconds here.
+        RespawnTime += Time.deltaTime;
+        if (RespawnTime > 3)
+        {
+            RemainingLives--;
+            LivesText.text = RemainingLives.ToString();
+            hitpoints = 100;
+            PlayerAnimator.SetTrigger("Respawn");
+            if (RemainingLives > 0)
+                this.transform.position = LastCheckpoint;               
+            else
+                Application.LoadLevel(Application.loadedLevel);  //reload the level as the player had no lives left and we want all of the AI to respawn.
+            RespawnTime = 0;
+        }
+    }
+
+    private void UpdateLastCheckpoint(Collider2D Checkpoint)
+    {
+        LastCheckpoint = Checkpoint.transform.position;
     }
 }

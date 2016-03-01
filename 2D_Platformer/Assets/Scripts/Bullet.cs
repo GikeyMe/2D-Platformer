@@ -37,6 +37,9 @@ public class Bullet : MonoBehaviour {
 
     void OnTriggerEnter2D(Collider2D collision)
     {
-        Destroy(gameObject); //if bullets collide with anything else destroy them
+        if (collision.gameObject.tag == "BossKnife")
+            return;
+        else
+            Destroy(gameObject); //if bullets collide with anything else destroy them
     }
 }
