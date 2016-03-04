@@ -323,3 +323,7 @@ Created third boss fight, was a mixture of first and second boss.
 
 Created health bar system. I created the graphic for the health bar myself, In unity I use a mask in order to keep the health bar in the correct position.
 Using unity filler image functionality in order to move the bar as a percentage.
+
+3rd March 2016
+---------------
+Created main menu and pause menu. Both are fully functional aside from Save/Load

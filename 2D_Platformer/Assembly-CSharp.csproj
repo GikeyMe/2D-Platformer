@@ -63,19 +63,21 @@
      <Compile Include="Assets\Scripts\Agents\Seeker.cs" />
      <Compile Include="Assets\Scripts\Agents\Slime.cs" />
      <Compile Include="Assets\Scripts\Agents\Worm.cs" />
-     <Compile Include="Assets\Scripts\BossKnife.cs" />
-     <Compile Include="Assets\Scripts\Bullet.cs" />
      <Compile Include="Assets\Scripts\Camera.cs" />
      <Compile Include="Assets\Scripts\GameObstacles\BossExitDoor.cs" />
      <Compile Include="Assets\Scripts\GameObstacles\CollisionTrigger.cs" />
      <Compile Include="Assets\Scripts\GameObstacles\ExitDoor.cs" />
      <Compile Include="Assets\Scripts\GameObstacles\LevelTransition.cs" />
-     <Compile Include="Assets\Scripts\GameObstacles\Lever.cs" />
      <Compile Include="Assets\Scripts\GameObstacles\MovingPlatform.cs" />
+     <Compile Include="Assets\Scripts\GameObstacles\NewLever.cs" />
+     <Compile Include="Assets\Scripts\GameObstacles\PowerUpController.cs" />
      <Compile Include="Assets\Scripts\HealthBar.cs" />
+     <Compile Include="Assets\Scripts\NonGameScripts\Menu.cs" />
+     <Compile Include="Assets\Scripts\NonGameScripts\PauseMenu.cs" />
+     <Compile Include="Assets\Scripts\NonGameScripts\PlayerPrefsX.cs" />
      <Compile Include="Assets\Scripts\Player.cs" />
-     <Compile Include="Assets\Scripts\PowerUpController.cs" />
-     <Compile Include="Assets\asd.cs" />
+     <Compile Include="Assets\Scripts\Prefab Scripts\BossKnife.cs" />
+     <Compile Include="Assets\Scripts\Prefab Scripts\Bullet.cs" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>

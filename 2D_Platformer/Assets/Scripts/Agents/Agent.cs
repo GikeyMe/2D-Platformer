@@ -32,6 +32,16 @@ public abstract class Agent : MonoBehaviour {
         return facingRight;
     }
 
+    public int getHitPoints()
+    {
+        return hitpoints;
+    }
+
+    public void setHitPoints(int hp)
+    {
+        hitpoints = hp;
+    }
+
     public float getpatrolSpeed()
     {
         return patrolSpeed;
@@ -65,6 +75,14 @@ public abstract class Agent : MonoBehaviour {
         AgentRigidbody = GetComponent<Rigidbody2D>();   //Get the Rigidbody2D and Animator objects from unity
         AgentAnimator = GetComponent<Animator>();
         player = GameObject.Find("Player");
+
+        if (gameObject.name == "Boss" && PlayerPrefsX.GetBool("BossLoading", true))
+        {
+            this.transform.position = PlayerPrefsX.GetVector3("BossPosition");
+            this.GetComponent<Rigidbody2D>().velocity = PlayerPrefsX.GetVector3("BossVelocity");
+            hitpoints = (PlayerPrefs.GetInt("BossHealth"));
+            PlayerPrefsX.SetBool("BossLoading", false);
+        }
     }
 
     protected bool Alive()
@@ -117,7 +135,7 @@ public abstract class Agent : MonoBehaviour {
             }
             if (EnterredObject.tag == "Melee")
             {
-                if (player.GetComponent<SpriteRenderer>().color == Color.blue)               //if sprite is blue player has melee powerup
+                if (player.GetComponent<Player>().isMeleePowerUp())               //if player has melee powerup
                     TakeDamage(50);
                 else
                     TakeDamage(20);

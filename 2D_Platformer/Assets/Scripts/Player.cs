@@ -67,30 +67,29 @@ public class Player : MonoBehaviour {
     private float RespawnTime;
     private int RemainingLives;
     [SerializeField]
-    private Text LivesText;  
+    private Text LivesText;
 
 
 
     // Use this for initialization
-    void Start () {
-        RemainingLives = 3;
-        LastCheckpoint = this.transform.position;
+    void Start() {
+
         Immunity = false;
         int index = 1;
-        facingRight = true;                              //we know the player character starts off facing right so set this to true
         PlayerRigidbody = GetComponent<Rigidbody2D>();   //Get the Rigidbody2D and Animator objects from unity
         PlayerAnimator = GetComponent<Animator>();
         PlayerSpriteRenderer = GetComponent<SpriteRenderer>();
         originalColor = PlayerSpriteRenderer.color;
+        facingRight = true;
 
         platform = GameObject.Find("MovingPlatform");                     //Add the first (non numbered) MovingPlatform to the arraylist if it exists.
         if (platform != null)
             MovingPlatforms.Add(platform);
-            
+
         while (true)                                                                           //loop until we have all of the MovingPlatforms in the game added to this ArrayList.
         {
             platform = GameObject.Find("MovingPlatform (" + index.ToString() + ")");
-            if (platform == null)  
+            if (platform == null)
             {
                 break;
             }
@@ -100,7 +99,24 @@ public class Player : MonoBehaviour {
             }
             index++;
         }
-        
+
+        if (!(PlayerPrefsX.GetBool("PlayerLoading")))
+        {
+            RemainingLives = 3;
+            LastCheckpoint = this.transform.position;
+        }
+        else
+        {
+            this.transform.position = PlayerPrefsX.GetVector3("PlayerPosition");
+            this.GetComponent<Rigidbody2D>().velocity = PlayerPrefsX.GetVector3("PlayerVelocity");
+            RemainingLives = (PlayerPrefs.GetInt("PlayerLives"));
+            hitpoints = (PlayerPrefs.GetInt("PlayerHealth"));
+            LastCheckpoint = (PlayerPrefsX.GetVector3("LastCheckpoint"));
+            PlayerPrefsX.SetBool("PlayerLoading", false);
+            myHealthBar.UpdateHealth(hitpoints, 100f);
+            LivesText.text = RemainingLives.ToString();
+        }
+
     }
 	
 	void FixedUpdate () {
@@ -124,9 +140,30 @@ public class Player : MonoBehaviour {
         HandleInput();                   //check for player input and deal with it as necessary
     }
 
+
+    public bool getFacingRight()
+    {
+        return facingRight;
+    }
+
+    public Vector3 getLastCheckpoint()
+    {
+        return LastCheckpoint;
+    }
+
     public bool isMeleePowerUp()
     {
         return MeleePowerUp;
+    }
+
+    public int getHitPoints()
+    {
+        return hitpoints;
+    }
+
+    public int getRemainingLives()
+    {
+        return RemainingLives;
     }
 
     private void HandleInput()
