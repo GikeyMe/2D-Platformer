@@ -327,3 +327,7 @@ Using unity filler image functionality in order to move the bar as a percentage.
 3rd March 2016
 ---------------
 Created main menu and pause menu. Both are fully functional aside from Save/Load
+
+Friday 4th March 2016
+---------------------
+Implemented Save load. still needs work

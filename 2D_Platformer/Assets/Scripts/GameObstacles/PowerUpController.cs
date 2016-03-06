@@ -17,7 +17,7 @@ public class PowerUpController : MonoBehaviour {
 
 
 
-    void Start()
+    public void Start()
     {
         mySpriteRenderer = GetComponent<SpriteRenderer>();
         mainCam = GameObject.Find("Main Camera");
@@ -54,7 +54,7 @@ public class PowerUpController : MonoBehaviour {
         }
     }
 
-    private void setNewLocation()
+    public void setNewLocation()
     {
         float tempx = mainCam.transform.position.x;
         tempx -= 21;

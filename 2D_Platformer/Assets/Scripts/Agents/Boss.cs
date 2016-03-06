@@ -38,6 +38,8 @@ public class Boss : Agent {
       //  onGround = CheckGrounded();
         base.Start();
         FirstPhase = true;
+        if (PlayerPrefsX.GetBool("PhaseNeedsLoaded", true))
+            setPhaseInformation();
     }
 
     void Update()
@@ -87,6 +89,10 @@ public class Boss : Agent {
             {
                 if (SecondPhase || ThirdPhase || FourthPhase)
                 {
+                    Debug.Log("SecondPhase : " + SecondPhase);
+                    Debug.Log("ThirdPhase : " + ThirdPhase);
+                    Debug.Log("FourthPhase : " + FourthPhase);
+
                     if (!(activeState is PhaseChangeState))
                         SetState(new PhaseChangeState());
                 }
@@ -102,6 +108,32 @@ public class Boss : Agent {
             activeState.Act();
         }
     }
+
+    private void setPhaseInformation()
+    {
+        FirstPhase = PlayerPrefsX.GetBool("BossFirstPhase");
+        SecondPhase = PlayerPrefsX.GetBool("BossSecondPhase");
+        ThirdPhase = PlayerPrefsX.GetBool("BossThirdPhase");
+        FourthPhase = PlayerPrefsX.GetBool("BossFourthPhase");
+        SecondPhaseReached = PlayerPrefsX.GetBool("BossSecondPhaseReached");
+        ThirdPhaseReached = PlayerPrefsX.GetBool("BossThirdPhaseReached");
+        FourthPhaseReached = PlayerPrefsX.GetBool("BossFourthPhaseReached");
+        PlayerPrefsX.SetBool("PhaseNeedsLoaded", false);
+    }
+
+
+    public void capturePhaseInformation()
+    {
+        PlayerPrefsX.SetBool("BossFirstPhase",FirstPhase);
+        PlayerPrefsX.SetBool("BossSecondPhase",SecondPhase);
+        PlayerPrefsX.SetBool("BossThirdPhase",ThirdPhase);
+        PlayerPrefsX.SetBool("BossFourthPhase",FourthPhase);
+        PlayerPrefsX.SetBool("BossSecondPhaseReached", SecondPhaseReached);
+        PlayerPrefsX.SetBool("BossThirdPhaseReached", ThirdPhaseReached);
+        PlayerPrefsX.SetBool("BossFourthPhaseReached", FourthPhaseReached);
+    }
+
+     
 
     public override void OnTriggerEnter2D(Collider2D EnterredObject)
     {

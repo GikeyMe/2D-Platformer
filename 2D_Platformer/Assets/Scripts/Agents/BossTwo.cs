@@ -45,6 +45,24 @@ public class BossTwo : Agent
     private SpriteRenderer powerupSpriteRenderer;
     private float originalRunSpeed;
 
+    public void capturePowerUpInformation()
+    {
+        Debug.Log("Capturing PowerUp Info");
+        PlayerPrefsX.SetBool("BossTwoMeleePower", MeleePowerUp);
+        PlayerPrefsX.SetLong("BossTwoPowerTimeRemaining", (long)PowerUpTime);
+    }
+
+    private void loadPowerUpInfo()
+    {
+        Debug.Log("Loading PowerUpInfo");
+        MeleePowerUp = PlayerPrefsX.GetBool("BossTwoMeleePower");
+        if (MeleePowerUp)
+            mySpriteRenderer.color = Color.blue;
+        PowerUpTime = PlayerPrefsX.GetLong("BossTwoPowerTimeRemaining");
+        PlayerPrefsX.SetBool("BossTwoLoad", false);
+        powerup.GetComponent<SpriteRenderer>().enabled = false;
+    }
+
     // Use this for initialization
     protected override void Start()
     {
@@ -55,6 +73,8 @@ public class BossTwo : Agent
         powerupSpriteRenderer = powerup.GetComponent<SpriteRenderer>();
         originalRunSpeed = runSpeed;
         Physics2D.IgnoreCollision(GetComponent<BoxCollider2D>(), player.GetComponent<BoxCollider2D>(), true);
+        if (PlayerPrefsX.GetBool("BossTwoLoad", true))
+            loadPowerUpInfo();
     }
 
     void Update()
@@ -66,7 +86,7 @@ public class BossTwo : Agent
         if (Alive())
         {
             UpdatePowerUp();
-            if (powerupSpriteRenderer.enabled && !playerObstructingPowerup())
+            if (powerupSpriteRenderer.enabled && !playerObstructingPowerup() && !MeleePowerUp)
             {
                 if (!(activeState is SeekPowerState))
                     SetState(new SeekPowerState());

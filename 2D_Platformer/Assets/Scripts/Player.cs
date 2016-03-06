@@ -115,6 +115,7 @@ public class Player : MonoBehaviour {
             PlayerPrefsX.SetBool("PlayerLoading", false);
             myHealthBar.UpdateHealth(hitpoints, 100f);
             LivesText.text = RemainingLives.ToString();
+            loadPowerUpInfo();
         }
 
     }
@@ -138,6 +139,22 @@ public class Player : MonoBehaviour {
     void Update()
     {
         HandleInput();                   //check for player input and deal with it as necessary
+    }
+
+    private void loadPowerUpInfo()
+    {
+        JumpPowerUp = PlayerPrefsX.GetBool("PlayerJumpPowerUp");
+        if (JumpPowerUp)
+            PlayerSpriteRenderer.color = Color.red;
+        MeleePowerUp = PlayerPrefsX.GetBool("PlayerMeleePowerUp");
+        PowerUpTime = PlayerPrefsX.GetLong("PlayerPowerTimeRemaining");
+    }
+
+    public void capturePowerUpInfo()
+    {
+        PlayerPrefsX.SetBool("PlayerJumpPowerUp", JumpPowerUp);
+        PlayerPrefsX.SetBool("PlayerMeleePowerUp", MeleePowerUp);
+        PlayerPrefsX.SetLong("PlayerPowerTimeRemaining", (long)PowerUpTime);
     }
 
 

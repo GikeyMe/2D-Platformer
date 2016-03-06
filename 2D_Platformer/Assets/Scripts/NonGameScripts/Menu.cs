@@ -23,6 +23,8 @@ public class Menu : MonoBehaviour {
             PlayerPrefsX.SetBool("PlayerLoading", false);
             PlayerPrefsX.SetBool("BossLoading", false);
             PlayerPrefsX.SetBool("LeverLoading", false);
+            PlayerPrefsX.SetBool("BossTwoLoad", false);
+            PlayerPrefsX.SetBool("PhaseNeedsLoaded", false);
             Application.LoadLevel("Level1");
         }
 
@@ -30,10 +32,18 @@ public class Menu : MonoBehaviour {
         {
             //load the saved level
             PlayerPrefsX.SetBool("PlayerLoading", true);
+            
             if (PlayerPrefs.GetString("CurrentLevel") == "Level2" || PlayerPrefs.GetString("CurrentLevel") == "Level4" || PlayerPrefs.GetString("CurrentLevel") == "Level6")
+            {                
                 PlayerPrefsX.SetBool("BossLoading", true);
+                if (PlayerPrefs.GetString("CurrentLevel") == "Level2")
+                    PlayerPrefsX.SetBool("PhaseNeedsLoaded", true);
+                if (PlayerPrefs.GetString("CurrentLevel") == "Level4")
+                    PlayerPrefsX.SetBool("BossTwoLoad", true);
+
+            }
             else
-                PlayerPrefsX.SetBool("BossLoading", false);
+            PlayerPrefsX.SetBool("BossLoading", false);
             PlayerPrefsX.SetBool("LeverLoading", true);
             Application.LoadLevel(PlayerPrefs.GetString("CurrentLevel"));
         }

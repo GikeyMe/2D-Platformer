@@ -66,12 +66,21 @@ public class PauseMenu : MonoBehaviour {
         PlayerPrefsX.SetVector3("LastCheckpoint", player.GetComponent<Player>().getLastCheckpoint());
         PlayerPrefs.SetInt("PlayerHealth", player.GetComponent<Player>().getHitPoints());
         PlayerPrefs.SetInt("PlayerLives", player.GetComponent<Player>().getRemainingLives());
+        player.GetComponent<Player>().capturePowerUpInfo();
         PlayerPrefs.SetString("CurrentLevel", Application.loadedLevelName);
         if (Application.loadedLevelName == "Level2" || Application.loadedLevelName == "Level4" || Application.loadedLevelName == "Level6")
         {
             PlayerPrefsX.SetVector3("BossPosition", boss.transform.position);
             PlayerPrefsX.SetVector3("BossVelocity", boss.GetComponent<Rigidbody2D>().velocity);
             PlayerPrefs.SetInt("BossHealth", boss.GetComponent<Agent>().getHitPoints());
+            if (Application.loadedLevelName == "Level2")
+            {
+                boss.GetComponent<Boss>().capturePhaseInformation();                
+            }
+            if (Application.loadedLevelName == "Level4")
+            {
+                boss.GetComponent<BossTwo>().capturePowerUpInformation();                
+            }
         }
         else
         {
