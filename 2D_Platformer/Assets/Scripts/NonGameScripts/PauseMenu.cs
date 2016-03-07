@@ -81,6 +81,10 @@ public class PauseMenu : MonoBehaviour {
             {
                 boss.GetComponent<BossTwo>().capturePowerUpInformation();                
             }
+            if(Application.loadedLevelName == "Level6")
+            {
+                boss.GetComponent<BossThree>().capturePowerUpInformation();
+            }
         }
         else
         {

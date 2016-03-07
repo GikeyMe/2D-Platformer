@@ -45,6 +45,24 @@ public class BossThree : Agent
     private SpriteRenderer powerupSpriteRenderer;
     private float originalRunSpeed;
 
+    public void capturePowerUpInformation()
+    {
+        Debug.Log("Capturing PowerUp Info");
+        PlayerPrefsX.SetBool("BossThreeMeleePower", MeleePowerUp);
+        PlayerPrefsX.SetLong("BossThreePowerTimeRemaining", (long)PowerUpTime);
+    }
+
+    private void loadPowerUpInfo()
+    {
+        Debug.Log("Loading PowerUpInfo");
+        MeleePowerUp = PlayerPrefsX.GetBool("BossThreeMeleePower");
+        if (MeleePowerUp)
+            mySpriteRenderer.color = Color.blue;
+        PowerUpTime = PlayerPrefsX.GetLong("BossThreePowerTimeRemaining");
+        PlayerPrefsX.SetBool("BossThreeLoad", false);
+        powerup.GetComponent<SpriteRenderer>().enabled = false;
+    }
+
     // Use this for initialization
     protected override void Start()
     {
@@ -55,6 +73,8 @@ public class BossThree : Agent
         powerupSpriteRenderer = powerup.GetComponent<SpriteRenderer>();
         originalRunSpeed = runSpeed;
         Physics2D.IgnoreCollision(GetComponent<BoxCollider2D>(), player.GetComponent<BoxCollider2D>(), true);
+        if (PlayerPrefsX.GetBool("BossThreeLoad", true))
+            loadPowerUpInfo();
     }
 
     void FixedUpdate()

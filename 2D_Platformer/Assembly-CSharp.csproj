@@ -64,6 +64,7 @@
      <Compile Include="Assets\Scripts\Agents\Slime.cs" />
      <Compile Include="Assets\Scripts\Agents\Worm.cs" />
      <Compile Include="Assets\Scripts\Camera.cs" />
+     <Compile Include="Assets\Scripts\DialogueManager.cs" />
      <Compile Include="Assets\Scripts\GameObstacles\BossExitDoor.cs" />
      <Compile Include="Assets\Scripts\GameObstacles\CollisionTrigger.cs" />
      <Compile Include="Assets\Scripts\GameObstacles\ExitDoor.cs" />
@@ -78,6 +79,12 @@
      <Compile Include="Assets\Scripts\Player.cs" />
      <Compile Include="Assets\Scripts\Prefab Scripts\BossKnife.cs" />
      <Compile Include="Assets\Scripts\Prefab Scripts\Bullet.cs" />
+     <None Include="Assets\Text\FirstDialogue.txt" />
+     <None Include="Assets\Text\SixthDialogue.txt" />
+     <None Include="Assets\Text\SecondDialogue.txt" />
+     <None Include="Assets\Text\FourthDialogue.txt" />
+     <None Include="Assets\Text\ThirdDialogue.txt" />
+     <None Include="Assets\Text\FifthDialogue.txt" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>

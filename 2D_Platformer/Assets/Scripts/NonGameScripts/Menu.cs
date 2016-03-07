@@ -24,12 +24,23 @@ public class Menu : MonoBehaviour {
             PlayerPrefsX.SetBool("BossLoading", false);
             PlayerPrefsX.SetBool("LeverLoading", false);
             PlayerPrefsX.SetBool("BossTwoLoad", false);
+            PlayerPrefsX.SetBool("BossThreeLoad", false);
             PlayerPrefsX.SetBool("PhaseNeedsLoaded", false);
             Application.LoadLevel("Level1");
         }
 
         if (GUI.Button(new Rect(Screen.width * .375f, Screen.height * guiPlacementY2, Screen.width * .25f, Screen.height * .1f), "", Button2))
         {
+            if (!PlayerPrefs.HasKey("CurrentLevel"))
+            {
+                PlayerPrefsX.SetBool("PlayerLoading", false);
+                PlayerPrefsX.SetBool("BossLoading", false);
+                PlayerPrefsX.SetBool("LeverLoading", false);
+                PlayerPrefsX.SetBool("BossTwoLoad", false);
+                PlayerPrefsX.SetBool("BossThreeLoad", false);
+                PlayerPrefsX.SetBool("PhaseNeedsLoaded", false);
+                Application.LoadLevel("Level1");
+            }
             //load the saved level
             PlayerPrefsX.SetBool("PlayerLoading", true);
             
@@ -40,6 +51,8 @@ public class Menu : MonoBehaviour {
                     PlayerPrefsX.SetBool("PhaseNeedsLoaded", true);
                 if (PlayerPrefs.GetString("CurrentLevel") == "Level4")
                     PlayerPrefsX.SetBool("BossTwoLoad", true);
+                if (PlayerPrefs.GetString("CurrentLevel") == "Level6")
+                    PlayerPrefsX.SetBool("BossThreeLoad", true);
 
             }
             else

@@ -1,0 +1,5 @@
+Hey Boss! You remember how to use your pager right? Press the return key to scroll through the message.
+Some weird ninja guy has broken into the space-station and they are letting all the captured aliens loose! We need to stop him boss!
+I know it has been a while since your last fight. You still remember how to use your weapon and your space-suit right?
+Press the Space Key to jump. Hold down Right Click to fire your Plasma rifle, and Left Click to use your space-suit's hydraulics for a melee attack!
+Your Space-suit also has a Heads Up Display, at the top left corner of your Visor, you should be able to see your health, and your remaining lives!

@@ -1,0 +1,2 @@
+Looks like the emergency doors have sealed boss. You'll need to find the levers to open it. There should be two of them, one corresponding to each of those switches. When you pull a lever, the corresponding switch
+should turn green, and when they are both green, the door should open!

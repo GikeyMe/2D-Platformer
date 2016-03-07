@@ -570,6 +570,11 @@ public class Player : MonoBehaviour {
                 PlayerRigidbody.gravityScale = 0;
                 PlayerAnimator.SetBool("OnLadder", true);
             }
+
+            if(EnterredObject.tag == "Dialogue")
+            {
+                EnterredObject.GetComponent<DialogueManager>().enableTextBox();
+            }
         }
         
     }
@@ -600,10 +605,14 @@ public class Player : MonoBehaviour {
             hitpoints = 100;
             PlayerAnimator.SetTrigger("Respawn");
             if (RemainingLives > 0)
-                this.transform.position = LastCheckpoint;               
+            {
+                this.transform.position = LastCheckpoint;
+                Immunity = true;
+            }
             else
                 Application.LoadLevel(Application.loadedLevel);  //reload the level as the player had no lives left and we want all of the AI to respawn.
             RespawnTime = 0;
+            
         }
     }
 
