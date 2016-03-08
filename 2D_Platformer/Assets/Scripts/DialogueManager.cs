@@ -58,6 +58,7 @@ public class DialogueManager : MonoBehaviour {
 
     public void enableTextBox()
     {
+        textBox.SetActive(false);
         currentLine = 0;
         textBox.SetActive(true);
         thisIsActive = true;

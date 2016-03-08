@@ -73,6 +73,7 @@
      <Compile Include="Assets\Scripts\GameObstacles\NewLever.cs" />
      <Compile Include="Assets\Scripts\GameObstacles\PowerUpController.cs" />
      <Compile Include="Assets\Scripts\HealthBar.cs" />
+     <Compile Include="Assets\Scripts\NonGameScripts\CompletionScreen.cs" />
      <Compile Include="Assets\Scripts\NonGameScripts\Menu.cs" />
      <Compile Include="Assets\Scripts\NonGameScripts\PauseMenu.cs" />
      <Compile Include="Assets\Scripts\NonGameScripts\PlayerPrefsX.cs" />
@@ -82,6 +83,7 @@
      <None Include="Assets\Text\FirstDialogue.txt" />
      <None Include="Assets\Text\SixthDialogue.txt" />
      <None Include="Assets\Text\SecondDialogue.txt" />
+     <None Include="Assets\Text\SeventhDialogue.txt" />
      <None Include="Assets\Text\FourthDialogue.txt" />
      <None Include="Assets\Text\ThirdDialogue.txt" />
      <None Include="Assets\Text\FifthDialogue.txt" />

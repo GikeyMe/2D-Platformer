@@ -25,7 +25,21 @@ public abstract class Agent : MonoBehaviour {
     [SerializeField]
     protected int hitpoints;
 
+    protected bool Immunity;
+    private float ImmunityTime;
 
+    protected void UpdateImmunity()
+    {
+        if (Immunity)
+        {
+            ImmunityTime += Time.deltaTime;
+            if (ImmunityTime > 1.5)
+            {
+                Immunity = false;
+                ImmunityTime = 0;
+            }
+        }
+    }
 
     public bool isFacingRight()
     {
@@ -135,15 +149,15 @@ public abstract class Agent : MonoBehaviour {
             }
             if (EnterredObject.tag == "Melee")
             {
-                if (player.GetComponent<Player>().isMeleePowerUp())               //if player has melee powerup
+                if (player.GetComponent<Player>().isMeleePowerUp() && !Immunity)               //if player has melee powerup
                     TakeDamage(50);
-                else
+                else if (!Immunity)
                     TakeDamage(20);
             }
         }
     }
 
-    private void TakeDamage(int hp)
+    protected virtual void TakeDamage(int hp)
     {
         hitpoints -= hp;
         if (Alive())

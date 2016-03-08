@@ -55,7 +55,7 @@ public class PowerUpController : MonoBehaviour {
     }
 
     public void setNewLocation()
-    {
+    { 
         float tempx = mainCam.transform.position.x;
         tempx -= 21;
         tempx = Random.Range(tempx, tempx + 42);

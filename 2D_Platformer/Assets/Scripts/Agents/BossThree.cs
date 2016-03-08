@@ -45,6 +45,21 @@ public class BossThree : Agent
     private SpriteRenderer powerupSpriteRenderer;
     private float originalRunSpeed;
 
+    protected override void TakeDamage(int hp)
+    {
+        if (!Alive())
+        {
+            AgentAnimator.SetTrigger("Death");
+            return;
+        }
+        base.TakeDamage(hp);
+        Immunity = true;
+    }
+
+    private void LoadCompletionScreen()
+    {
+        Application.LoadLevel("CompletionScreen");
+    }
     public void capturePowerUpInformation()
     {
         Debug.Log("Capturing PowerUp Info");
@@ -79,42 +94,42 @@ public class BossThree : Agent
 
     void FixedUpdate()
     {
-        onGround = CheckGrounded();
-        if (AgentRigidbody.velocity.y < 0)  //if player character is falling and not on a moving platform
-        {
-            AgentAnimator.SetBool("Falling", true); //play falling animation. This can't be a trigger because we are unsure how far the player character is falling and so the animation has to be played 
-        }                                            // until explicitly told to stop. (i.e boolean is false again)
-        HandleLayers();
+            onGround = CheckGrounded();
+            if (AgentRigidbody.velocity.y < 0)  //if player character is falling and not on a moving platform
+            {
+                AgentAnimator.SetBool("Falling", true); //play falling animation. This can't be a trigger because we are unsure how far the player character is falling and so the animation has to be played 
+            }                                            // until explicitly told to stop. (i.e boolean is false again)
+            HandleLayers();
     }
 
     void Update()
     {
         //prioritise getting powerup but ignore if player is closer to it
         //otherwise melee attack player.
-
+        UpdateImmunity();
         myHealthBar.UpdateHealth(hitpoints, 800f);
-        if (Alive())
-        {
             UpdatePowerUp();
             if(!MeleePowerUp && (!powerupSpriteRenderer.enabled || playerObstructingPowerup()) && !PlayerMeleeRange())
             {
                 if (!(activeState is RangedAttackState))
                     SetState(new RangedAttackState());
             }
-             else if (powerupSpriteRenderer.enabled && !playerObstructingPowerup())
+             else if (powerupSpriteRenderer.enabled && !playerObstructingPowerup() && PowerUpReachable())
             {
                 if (!(activeState is SeekPowerState))
                     SetState(new SeekPowerState());
             }
             else if (!(activeState is MeleeAttackState))
                 SetState(new MeleeAttackState());
-        }
-        else
-        {
-            SetState(new PhaseChangeState());
-            exitDoor.OpenDoor();
-        }
         activeState.Act();
+    }
+
+    private bool PowerUpReachable() //use this to ensure boss doesn't attempt to collect powerup when it is above spike traps
+    { 
+        if ((powerup.transform.position.x > 20 && powerup.transform.position.x < 26) || (powerup.transform.position.x > 57.5 && powerup.transform.position.x < 63.77)
+            || (powerup.transform.position.x > 95.5 && powerup.transform.position.x < 101))
+            return false;
+        return true;
     }
 
     private void UpdatePowerUp()

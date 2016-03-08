@@ -37,7 +37,8 @@ public class Bullet : MonoBehaviour {
 
     void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.tag == "BossKnife")
+        if (collision.gameObject.tag == "BossKnife" || collision.gameObject.tag == "Checkpoint" || collision.gameObject.tag == "Dialogue" || collision.gameObject.tag == "JumpNotify"
+            || collision.gameObject.tag == "PhaseTwo" || collision.gameObject.tag == "PhaseThree" || collision.gameObject.tag == "PhaseFour" || collision.gameObject.tag == "NoSpawn")
             return;
         else
             Destroy(gameObject); //if bullets collide with anything else destroy them

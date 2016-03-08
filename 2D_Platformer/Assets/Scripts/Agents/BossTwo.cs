@@ -45,6 +45,13 @@ public class BossTwo : Agent
     private SpriteRenderer powerupSpriteRenderer;
     private float originalRunSpeed;
 
+    protected override void TakeDamage(int hp)
+    {
+        base.TakeDamage(hp);
+        Immunity = true;
+    }
+
+
     public void capturePowerUpInformation()
     {
         Debug.Log("Capturing PowerUp Info");
@@ -81,7 +88,7 @@ public class BossTwo : Agent
     {
         //prioritise getting powerup but ignore if player is closer to it
         //otherwise melee attack player.
-
+        UpdateImmunity();
         myHealthBar.UpdateHealth(hitpoints, 800f);
         if (Alive())
         {
