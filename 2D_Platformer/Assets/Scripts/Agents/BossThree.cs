@@ -100,27 +100,23 @@ public class BossThree : Agent
                 AgentAnimator.SetBool("Falling", true); //play falling animation. This can't be a trigger because we are unsure how far the player character is falling and so the animation has to be played 
             }                                            // until explicitly told to stop. (i.e boolean is false again)
             HandleLayers();
-    }
-
-    void Update()
-    {
         //prioritise getting powerup but ignore if player is closer to it
         //otherwise melee attack player.
         UpdateImmunity();
         myHealthBar.UpdateHealth(hitpoints, 800f);
-            UpdatePowerUp();
-            if(!MeleePowerUp && (!powerupSpriteRenderer.enabled || playerObstructingPowerup()) && !PlayerMeleeRange())
-            {
-                if (!(activeState is RangedAttackState))
-                    SetState(new RangedAttackState());
-            }
-             else if (powerupSpriteRenderer.enabled && !playerObstructingPowerup() && PowerUpReachable())
-            {
-                if (!(activeState is SeekPowerState))
-                    SetState(new SeekPowerState());
-            }
-            else if (!(activeState is MeleeAttackState))
-                SetState(new MeleeAttackState());
+        UpdatePowerUp();
+        if (!MeleePowerUp && (!powerupSpriteRenderer.enabled || playerObstructingPowerup()) && !PlayerMeleeRange())
+        {
+            if (!(activeState is RangedAttackState))
+                SetState(new RangedAttackState());
+        }
+        else if (powerupSpriteRenderer.enabled && !playerObstructingPowerup() && PowerUpReachable())
+        {
+            if (!(activeState is SeekPowerState))
+                SetState(new SeekPowerState());
+        }
+        else if (!(activeState is MeleeAttackState))
+            SetState(new MeleeAttackState());
         activeState.Act();
     }
 

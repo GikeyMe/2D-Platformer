@@ -42,8 +42,15 @@ public class Boss : Agent {
             setPhaseInformation();
     }
 
-    void Update()
+    void FixedUpdate()
     {
+      onGround = CheckGrounded();
+      if (AgentRigidbody.velocity.y < 0)  //if player character is falling and not on a moving platform
+      {
+            AgentAnimator.SetBool("Falling", true); //play falling animation. This can't be a trigger because we are unsure how far the player character is falling and so the animation has to be played 
+      }                                            // until explicitly told to stop. (i.e boolean is false again)
+      HandleLayers();
+
         myHealthBar.UpdateHealth(hitpoints, 400f);
         if (hitpoints < 300 && !SecondPhaseReached)
         {
@@ -172,16 +179,6 @@ public class Boss : Agent {
                 return true;
         }
         return false;
-    }
-
-    void FixedUpdate()
-    {       
-        onGround = CheckGrounded();
-        if (AgentRigidbody.velocity.y < 0)  //if player character is falling and not on a moving platform
-        {
-            AgentAnimator.SetBool("Falling", true); //play falling animation. This can't be a trigger because we are unsure how far the player character is falling and so the animation has to be played 
-        }                                            // until explicitly told to stop. (i.e boolean is false again)
-        HandleLayers();
     }
 
     private void Jump()

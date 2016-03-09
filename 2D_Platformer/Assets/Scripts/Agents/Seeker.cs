@@ -23,7 +23,7 @@ public class Seeker : Agent {
         originalColor = SeekerSpriteRenderer.color;
     }
 
-    void Update()
+    void FixedUpdate()
     {
         if (Alive())
         {

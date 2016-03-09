@@ -11,7 +11,7 @@ public class Bat : Agent {
         base.Start();
     }
 
-    void Update()
+    void FixedUpdate()
     {
         if (Alive())
         {

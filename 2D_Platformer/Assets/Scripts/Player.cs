@@ -69,6 +69,8 @@ public class Player : MonoBehaviour {
     [SerializeField]
     private Text LivesText;
 
+    private bool MeleeKeyPressed;
+
 
 
     // Use this for initialization
@@ -121,25 +123,33 @@ public class Player : MonoBehaviour {
     }
 	
 	void FixedUpdate () {
+        if (MeleeKeyPressed)
+        {
+            PlayerAnimator.SetTrigger("melee");  //trigger the melee parameter in unity to start animation transition
+            PlayerRigidbody.velocity = Vector2.zero; //stop movement on all axes while animation plays
+            if (MeleePowerUp)
+                PlayerSpriteRenderer.color = Color.blue;
+            MeleeKeyPressed = false;
+        }
+        onGround = CheckGrounded();                     //better to use a variable here so we don't need to keep calling CheckGrounded() throughout FixedUpdate, don't want to slow the game down.
+        float horizontal = Input.GetAxis("Horizontal"); //Unity already has keybinds set up for right and left movement. GetAxis returns a float representing the direction the player is inputting.
+        PlayerMovement(horizontal);  // handle player movement
+        HandleLayers();
+        Flip(horizontal);            // do we need to flip the sprite?
         if (hitpoints <= 0)
             PlayerRespawn();
-        onGround = CheckGrounded();                     //better to use a variable here so we don't need to keep calling CheckGrounded() throughout FixedUpdate, don't want to slow the game down.
         OnMovingPlat = IsPlayerOnMovingPlatform();
-        float horizontal = Input.GetAxis("Horizontal"); //Unity already has keybinds set up for right and left movement. GetAxis returns a float representing the direction the player is inputting.
         UpdateImmunity();
         myHealthBar.UpdateHealth(hitpoints,100f);
         UpdateHealthRegen();
         UpdatePowerUp();
-        PlayerMovement(horizontal);  // handle player movement
-        Flip(horizontal);            // do we need to flip the sprite?
-        HandleLayers();
     }
 
-    //called once per frame
-    void Update()
+    private void Update()
     {
         HandleInput();                   //check for player input and deal with it as necessary
     }
+
 
     private void loadPowerUpInfo()
     {
@@ -189,10 +199,7 @@ public class Player : MonoBehaviour {
         {
             if (Input.GetKeyDown(KeyCode.Mouse0) && !this.PlayerAnimator.GetCurrentAnimatorStateInfo(0).IsTag("Melee")) //if player presses melee key and we aren't already playing melee animation
             {
-                PlayerAnimator.SetTrigger("melee");  //trigger the melee parameter in unity to start animation transition
-                PlayerRigidbody.velocity = Vector2.zero; //stop movement on all axes while animation plays
-                if (MeleePowerUp)
-                    PlayerSpriteRenderer.color = Color.blue;
+                MeleeKeyPressed = true;
             }
 
             if (Input.GetKeyDown(KeyCode.Space) && (onGround || JumpPowerUp))  //if the player presses space and we aren't already jumping or falling
@@ -201,24 +208,23 @@ public class Player : MonoBehaviour {
                 PlayerRigidbody.AddForce(new Vector2(0, jumpSpeed));    // make the player character jump (i.e apply a positive force on the y axis)
                 PlayerAnimator.SetTrigger("Jump");                         // Trigger the jump animation
             }
+            if (Input.GetKeyUp(KeyCode.Mouse1))
+            {
+                PlayerAnimator.SetBool("Shooting", false);
+            }
+            if (Input.GetKeyUp(KeyCode.E))
+            {
+                Usebox.enabled = false;
+            }
 
             if (Input.GetKeyDown(KeyCode.Mouse1))
             {
                 PlayerAnimator.SetBool("Shooting", true);
             }
 
-            if (Input.GetKeyUp(KeyCode.Mouse1))
-            {
-                PlayerAnimator.SetBool("Shooting", false);
-            }
-
             if (Input.GetKeyDown(KeyCode.E))
             {
                 Usebox.enabled = true;
-            }
-            if (Input.GetKeyUp(KeyCode.E))
-            {
-                Usebox.enabled = false;
             }
         }
     }

@@ -11,7 +11,7 @@ public class Slime : Agent {
         base.Start();
     }
 	
-	void Update () {
+	void FixedUpdate () {
         if (Alive())
         {
             PlayerNearby = LookForPlayer();

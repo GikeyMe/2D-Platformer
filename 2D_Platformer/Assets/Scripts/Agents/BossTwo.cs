@@ -84,7 +84,7 @@ public class BossTwo : Agent
             loadPowerUpInfo();
     }
 
-    void Update()
+    void FixedUpdate()
     {
         //prioritise getting powerup but ignore if player is closer to it
         //otherwise melee attack player.
@@ -172,10 +172,10 @@ public class BossTwo : Agent
     }
 
     protected override void DisableHitBox()
-    {
-        MeleeHitBox.enabled = false;
+    {      
         PowerMeleeHitBox.enabled = false;
-    }
+        MeleeHitBox.enabled = false;
+    } 
 
     private bool playerObstructingPowerup()
     {

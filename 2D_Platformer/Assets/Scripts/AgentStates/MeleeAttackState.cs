@@ -23,7 +23,9 @@ public class MeleeAttackState : IAgentState
 
     public void Act()
     {
-        currentAgent.MeleeHitBox.enabled = false;
+        if(!(currentAgent is Boss) && !(currentAgent is BossTwo) && !(currentAgent is BossThree) && !(currentAgent is Worm) &&!(currentAgent is Seeker)) 
+            currentAgent.MeleeHitBox.enabled = false;
+
             if (RecentlyAttacked && (!(currentAgent is Worm) && !(currentAgent is Boss) && !(currentAgent is BossTwo) && !(currentAgent is BossThree) && !(currentAgent is Seeker)))
             {
                 MoveFromPlayer();

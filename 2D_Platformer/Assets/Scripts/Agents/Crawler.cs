@@ -14,7 +14,7 @@ public class Crawler : Agent {
     private bool hiding;
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         if (Alive())
         {

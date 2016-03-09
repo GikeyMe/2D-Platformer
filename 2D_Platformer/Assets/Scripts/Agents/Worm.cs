@@ -11,7 +11,7 @@ public class Worm : Agent {
         base.Start();
     }
 
-    void Update()
+    void FixedUpdate()
     {
         if (Alive())
         {
