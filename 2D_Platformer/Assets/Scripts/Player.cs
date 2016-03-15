@@ -70,6 +70,7 @@ public class Player : MonoBehaviour {
     private Text LivesText;
 
     private bool MeleeKeyPressed;
+    private bool RemoveControl;
 
 
 
@@ -147,7 +148,8 @@ public class Player : MonoBehaviour {
 
     private void Update()
     {
-        HandleInput();                   //check for player input and deal with it as necessary
+        if (!RemoveControl)
+            HandleInput();                   //check for player input and deal with it as necessary
     }
 
 
@@ -327,7 +329,7 @@ public class Player : MonoBehaviour {
 
     private void HandleLayers()  //If the Player character is in the air we need to have the air layer fully weighted so that we play air animations, otherwise set the weight to 0 to play ground animations.
     {
-        if (!onGround)
+        if (!onGround && !OnLadder)
         {
             PlayerAnimator.SetLayerWeight(1, 1);  //set weight for air layer (layer 1) to full (1)
         }
@@ -505,6 +507,10 @@ public class Player : MonoBehaviour {
     {
         if (Alive())
         {
+            if(EnterredObject.tag == "PitWall")
+            {
+                RemoveControl = true;
+            }
             if(EnterredObject.tag == "Checkpoint")
             {
                 UpdateLastCheckpoint(EnterredObject);
@@ -609,6 +615,7 @@ public class Player : MonoBehaviour {
             RemainingLives--;
             LivesText.text = RemainingLives.ToString();
             hitpoints = 100;
+            RemoveControl = false;
             PlayerAnimator.SetTrigger("Respawn");
             if (RemainingLives > 0)
             {

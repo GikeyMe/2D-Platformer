@@ -169,6 +169,20 @@ public class Boss : Agent {
         if (EnterredObject.tag == "BossDespawn" && hitpoints <= 0)
             Destroy(gameObject);
         base.OnTriggerEnter2D(EnterredObject);
+
+        if (EnterredObject.gameObject.name == ("SpikeTrigger") || EnterredObject.tag == "PitWall")
+        {
+            if (FourthPhaseReached)
+                transform.position = new Vector3(108.9f, -5.3f);
+            else if (ThirdPhaseReached)
+                transform.position = new Vector3(71.4f, -5.3f);
+            else if (SecondPhaseReached)
+                transform.position = new Vector3(35.6f, -5.3f);
+            else
+                transform.position = new Vector3(-3.3f, -5.3f);
+        }
+
+
     }
 
     protected override bool LookForPlayer()

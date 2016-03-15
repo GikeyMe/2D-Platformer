@@ -4,6 +4,7 @@ using System.Collections;
 public class Worm : Agent {
 
     private bool PlayerNearby;
+    private bool triggeredDeath;
 
     // Use this for initialization
     protected override void Start()
@@ -28,6 +29,11 @@ public class Worm : Agent {
                 SetState(new ChaseState());
 
             activeState.Act();
+        }
+        if (!Alive() && !triggeredDeath)
+        {
+            triggeredDeath = true;
+            AgentAnimator.SetTrigger("Death");
         }
     }
 

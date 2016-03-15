@@ -23,5 +23,9 @@ public class IdleState : IAgentState
             if (AgentRigidbody.velocity.x == 0)
                 AgentAnimator.SetFloat("speed", 0);
         }
+        if(currentAgent is Bat)
+        {
+            AgentRigidbody.velocity = new Vector2(0, 0);
+        }
     }
 }

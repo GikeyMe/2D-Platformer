@@ -177,6 +177,10 @@ public class BossThree : Agent
         }
         if (EnterredObject.tag == "BossDespawn" && hitpoints <= 0)
             Destroy(gameObject);
+        if (EnterredObject.gameObject.name == ("SpikeTrigger") || EnterredObject.tag == "PitWall")
+        {
+            transform.position = new Vector3(7.25f, -5.54f);
+        }
     }
 
     private void Jump()

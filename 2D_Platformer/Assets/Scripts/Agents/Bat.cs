@@ -33,7 +33,7 @@ public class Bat : Agent {
     {
         if (Mathf.Abs(player.transform.position.x - AgentRigidbody.transform.position.x) < 25)
         {
-            if (Mathf.Abs(player.transform.position.y - AgentRigidbody.transform.position.y) < 10)
+            if (Mathf.Abs(player.transform.position.y - AgentRigidbody.transform.position.y) < 20)
                 return true;
         }
         return false;
